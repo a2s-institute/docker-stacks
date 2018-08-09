@@ -1,0 +1,10 @@
+FROM ros:kinetic
+
+RUN apt update -qq
+#&& apt install dpkg
+#RUN apt upgrade -y -qq
+RUN apt install -y python-catkin-tools \
+    python-wstools \
+    python-catkin-lint \
+    vim
+RUN rosdep update
