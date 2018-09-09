@@ -4,9 +4,9 @@ services:
     build:
       dockerfile: base/kinetic/Dockerfile
       context: .
-    image: argenos/bitbots-base:kinetic
+    image: bitbots/bitbots-base:kinetic
   melodic_base:
     build:
       dockerfile: base/melodic/Dockerfile
       context: .
-    image: argenos/bitbots-base:melodic
+    image: bitbots/bitbots-base:melodic
