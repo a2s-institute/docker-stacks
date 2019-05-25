@@ -14,15 +14,23 @@ before_install:
   - sudo curl -L https://github.com/docker/compose/releases/download/1.22.0/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
   - sudo chmod +x /usr/local/bin/docker-compose
   - docker-compose -v
-
-script:
-  - docker-compose build
   - echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
-  - docker images
-  - docker push bitbots/bitbots-base:kinetic
-  - docker push bitbots/bitbots-base:melodic
-  - docker tag bitbots/bitbots-base:kinetic bitbots/bitbots-base:latest
-  - docker push bitbots/bitbots-base:latest
+
+stages:
+  - build
+  - deploy
+
+jobs:
+  include:
+    - stage: build
+      name: "Base images"
+      script:
+        - docker-compose -f base/docker-compose.yaml build
+        - docker images
+        - docker push bitbots/bitbots-base:kinetic
+        - docker push bitbots/bitbots-base:melodic
+        - docker tag bitbots/bitbots-base:kinetic bitbots/bitbots-base:latest
+        - docker push bitbots/bitbots-base:latest
 
 
 notifications:

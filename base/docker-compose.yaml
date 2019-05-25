@@ -2,11 +2,11 @@ version: '2'
 services:
   kinetic_base:
     build:
-      dockerfile: base/kinetic/Dockerfile
+      dockerfile: kinetic/Dockerfile
       context: .
     image: bitbots/bitbots-base:kinetic
   melodic_base:
     build:
-      dockerfile: base/melodic/Dockerfile
+      dockerfile: melodic/Dockerfile
       context: .
     image: bitbots/bitbots-base:melodic
