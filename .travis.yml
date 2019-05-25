@@ -31,6 +31,12 @@ jobs:
         - docker push bitbots/bitbots-base:melodic
         - docker tag bitbots/bitbots-base:kinetic bitbots/bitbots-base:latest
         - docker push bitbots/bitbots-base:latest
+    - stage: deploy
+      name: "Domestic: base image"
+      script:
+        - docker-compose -f domestic/docker-compose.yaml build
+        - docker build -f domestic/melodic/Base.docker -t bitbots/bitbots-domestic:melodic-base domestic/melodic
+        - docker images
 
 
 notifications:
