@@ -34,8 +34,8 @@ jobs:
     - stage: deploy
       name: "Domestic: base image"
       script:
-        - docker-compose -f domestic/docker-compose.yaml build
         - docker build -f domestic/melodic/Base.docker -t bitbots/bitbots-domestic:melodic-base domestic/melodic
+        - docker push bitbots/bitbots-domestic:melodic-base
         - docker images
 
 
