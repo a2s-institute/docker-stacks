@@ -42,3 +42,8 @@
     local-name: ftsm
     uri: https://github.com/b-it-bots/ftsm.git
     version: master
+
+- git:
+    local-name: hector_slam
+    uri: https://github.com/tu-darmstadt-ros-pkg/hector_slam.git
+    version: melodic-devel
