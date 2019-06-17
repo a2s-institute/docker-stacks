@@ -6,4 +6,5 @@ RUN apt update -qq && \
     python-wstools \
     python-catkin-lint \
     vim \
+    python-pip \
     && rm -rf /var/lib/apt/lists/*
