@@ -1,0 +1,16 @@
+version: '3'
+services:
+  kinetic_base:
+    build:
+      dockerfile: Dockerfile
+      context: ./kinetic/
+      args:
+        - UNAME=$USER
+    image: bitbots/bitbots-industrial:kinetic-base
+  melodic_base:
+    build:
+      dockerfile: Dockerfile
+      context: ./melodic/
+      args:
+        - UNAME=$USER
+    image: bitbots/bitbots-industrial:melodic-base
