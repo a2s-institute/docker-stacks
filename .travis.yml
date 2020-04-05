@@ -32,13 +32,15 @@ jobs:
         - docker tag bitbots/bitbots-base:kinetic bitbots/bitbots-base:latest
         - docker push bitbots/bitbots-base:latest
     - stage: deploy
-      name: "Domestic and Industrial: base image"
+      name: "Domestic base image"
       script:
         - docker build -f domestic/melodic/Base.docker -t bitbots/bitbots-domestic:melodic-base domestic/melodic
+        - docker images
+        - docker push bitbots/bitbots-domestic:melodic-base
+      name: "Industrial base image"
         - docker build --build-arg UID=$(id -u) --build-arg GID=$(id -g) --build-arg UNAME=$kinetic_user -f industrial/kinetic/Dockerfile -t bitbots/bitbots-industrial:kinetic-base .
         - docker build --build-arg UID=$(id -u) --build-arg GID=$(id -g) --build-arg UNAME=$melodic_user -f industrial/melodic/Dockerfile -t bitbots/bitbots-industrial:melodic-base .
         - docker images
-        - docker push bitbots/bitbots-domestic:melodic-base
         - docker push bitbots/bitbots-industrial:kinetic-base
         - docker push bitbots/bitbots-industrial:melodic-base
 
