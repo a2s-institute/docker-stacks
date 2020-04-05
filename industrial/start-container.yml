@@ -20,3 +20,23 @@ services:
         privileged: true
         tty: true
         network_mode: "host"
+    ros_melodic_container:
+        image: bitbots/bitbots-industrial:melodic-base
+        volumes:
+            - /home/iswariya/Documents/Robocup:/temp
+            - /tmp/.X11-unix:/tmp/.X11-unix:rw
+            - /usr/lib32/nvidia-390:/usr/lib32/nvidia-390  # provide locally installed -
+            - /usr/lib/nvidia-390:/usr/lib/nvidia-390      # - nvidia driver version
+            - $HOME/.rviz:/home/kinetic_user/.rviz  # include if any specific rviz settings are needed
+        environment:
+            - DISPLAY=$DISPLAY
+            - QT_X11_NO_MITSHM=1
+            - NVIDIA_VISIBLE_DEVICES=all
+            - LD_LIBRARY_PATH=/usr/lib/nvidia-390:/usr/lib32/nvidia-390
+            - ROBOT=youbot-brsu-4   # Can be modified here if necessary
+            - ROBOT_ENV=brsu-c025-sim # For youbot simulation
+        devices:
+            - /dev/dri:/dev/dri
+        privileged: true
+        tty: true
+        network_mode: "host"
