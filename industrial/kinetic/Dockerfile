@@ -8,7 +8,7 @@ ENV NVIDIA_DRIVER_CAPABILITIES \
 
 RUN apt update -qq \
     && sudo apt-get install -y -qq software-properties-common \
-    && sudo apt-get install -y -qq curl figlet \
+    && sudo apt-get install -y -qq curl figlet wget\
     && sudo apt-get install -y -qq nmap
 
 RUN sudo rm -rf /etc/ros/rosdep/sources.list.d/* \

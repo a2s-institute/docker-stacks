@@ -8,7 +8,7 @@ ENV NVIDIA_DRIVER_CAPABILITIES \
 
 RUN apt update -qq \
     && sudo apt install -y -qq software-properties-common \
-    && sudo apt install -y -qq curl figlet \
+    && sudo apt install -y -qq curl figlet wget\
     && sudo apt install -y -qq nmap
 
 RUN sudo apt-get install python-rosdep \
