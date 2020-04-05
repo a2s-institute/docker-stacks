@@ -27,7 +27,7 @@ RUN sudo sh -c "echo \"deb http://packages.ros.org/ros/ubuntu xenial main\" > /e
 ENV ROBOT=youbot-brsu-4
 ENV ROBOT_ENV=brsu-c025
 
-COPY industrial/kinetic/install_pkg_script.sh /kinetic/install_pkg_script.sh
+COPY install_pkg_script.sh /kinetic/install_pkg_script.sh
 RUN chmod +x /kinetic/install_pkg_script.sh && /kinetic/install_pkg_script.sh
 ARG UNAME=kinetic_user
 ARG UID=1000

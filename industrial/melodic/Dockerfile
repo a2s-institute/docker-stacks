@@ -21,7 +21,7 @@ RUN sudo apt-get install python-rosdep \
 ENV ROBOT=youbot-brsu-4
 ENV ROBOT_ENV=brsu-c025
 
-COPY industrial/melodic/install_pkg_script.sh /melodic/install_pkg_script.sh
+COPY install_pkg_script.sh /melodic/install_pkg_script.sh
 RUN chmod +x /melodic/install_pkg_script.sh && /melodic/install_pkg_script.sh
 ARG UNAME=melodic_user
 ARG UID=1000

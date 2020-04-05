@@ -39,8 +39,8 @@ jobs:
         - docker push bitbots/bitbots-domestic:melodic-base
     - stage: deploy
       name: "Industrial base image"
-        - docker build --build-arg UID=$(id -u) --build-arg GID=$(id -g) --build-arg UNAME=$kinetic_user -f industrial/kinetic/Dockerfile -t bitbots/bitbots-industrial:kinetic-base .
-        - docker build --build-arg UID=$(id -u) --build-arg GID=$(id -g) --build-arg UNAME=$melodic_user -f industrial/melodic/Dockerfile -t bitbots/bitbots-industrial:melodic-base .
+      script:
+        - docker-compose -f industrial/docker-compose.yml build
         - docker images
         - docker push bitbots/bitbots-industrial:kinetic-base
         - docker push bitbots/bitbots-industrial:melodic-base
