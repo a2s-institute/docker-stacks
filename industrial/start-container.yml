@@ -3,7 +3,7 @@ services:
     ros_kinetic_container:
         image: bitbots/bitbots-industrial:kinetic-base
         volumes:
-            - /home/iswariya/Documents/Robocup:/temp
+            - /home/iswariya/Documents/Robocup:/kinetic
             - /tmp/.X11-unix:/tmp/.X11-unix:rw
             - /usr/lib32/nvidia-390:/usr/lib32/nvidia-390  # provide locally installed -
             - /usr/lib/nvidia-390:/usr/lib/nvidia-390      # - nvidia driver version
@@ -23,7 +23,7 @@ services:
     ros_melodic_container:
         image: bitbots/bitbots-industrial:melodic-base
         volumes:
-            - /home/iswariya/Documents/Robocup:/temp
+            - /home/iswariya/Documents/Robocup:/melodic
             - /tmp/.X11-unix:/tmp/.X11-unix:rw
             - /usr/lib32/nvidia-390:/usr/lib32/nvidia-390  # provide locally installed -
             - /usr/lib/nvidia-390:/usr/lib/nvidia-390      # - nvidia driver version

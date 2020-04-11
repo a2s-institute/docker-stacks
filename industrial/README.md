@@ -14,7 +14,7 @@ Advantages of using this image over a local build:
 
 * Download the sample start-container-<ros_dist>.yml file from this repository and modify the following based on your requirements:
   * Change the \<host file system path\> (/home/iswariya/Documents/Robocup) to the folder where you have cloned the MAS industrial robotics repository and where you want your catkin workspace to be created
-  Note: All files and folders available in the \<host file system path\> will be mapped to the \<mounted directory\> (/temp) inside the container
+  Note: All files and folders available in the \<host file system path\> will be mapped to the \<mounted directory\> (/kinetic or /melodic) inside the container
   * Modify the nvidia-390 with the version of nvidia driver installed in your system
   * $HOME/.rviz:/home/<ros_dist>_user/.rviz is optional. Favorite Rviz configurations which are stored in your local file system will be mounted onto your docker container
 * Then run the following command from the folder containing the start-container.yml file. This spins up a container based on the bitbots/bitbots-industrial:<ros_dist>-base image

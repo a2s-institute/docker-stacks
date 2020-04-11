@@ -1,5 +1,7 @@
 FROM bitbots/bitbots-base:melodic
 
+ARG DEBIAN_FRONTEND=noninteractive
+
 ENV NVIDIA_VISIBLE_DEVICES \
     ${NVIDIA_VISIBLE_DEVICES:-all}
 
@@ -7,22 +9,33 @@ ENV NVIDIA_DRIVER_CAPABILITIES \
     ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics
 
 RUN apt update -qq \
-    && sudo apt install -y -qq software-properties-common \
-    && sudo apt install -y -qq curl figlet wget\
-    && sudo apt install -y -qq nmap
+    && sudo apt-get install -y -qq software-properties-common \
+    curl \
+    figlet \
+    wget \
+    nmap \
+    gcc-multilib \
+    g++-multilib
 
-RUN sudo apt-get install python-rosdep \
-    && sudo rm -rf /etc/ros/rosdep/sources.list.d/* \
+RUN sudo rm -rf /etc/ros/rosdep/sources.list.d/* \
     && sudo rosdep init -q \
     && rosdep update -q \
-    && sudo apt install -y -qq python-rosinstall python-rosinstall-generator build-essential\
+    && sudo apt install -y -qq python-rosinstall python-rosinstall-generator build-essential \
     && sudo pip install catkin_pkg empy
+
+WORKDIR /melodic
+
+RUN wstool init --shallow src \
+    && wstool merge -t src https://raw.githubusercontent.com/b-it-bots/mas_industrial_robotics/melodic/repository.rosinstall \
+    && wstool update -t src \
+    && rosdep update -q \
+    && sudo apt-get update \
+    && rosdep install --from-paths src --ignore-src --rosdistro=melodic --skip-keys rosplan_demos -y \
+    && rm -rf src
 
 ENV ROBOT=youbot-brsu-4
 ENV ROBOT_ENV=brsu-c025
 
-COPY install_pkg_script.sh /melodic/install_pkg_script.sh
-RUN chmod +x /melodic/install_pkg_script.sh && /melodic/install_pkg_script.sh
 ARG UNAME=melodic_user
 ARG UID=1000
 ARG GID=1000
