@@ -33,6 +33,23 @@ RUN wstool init --shallow src \
     && rosdep install --from-paths src --ignore-src --rosdistro=melodic --skip-keys rosplan_demos -y \
     && rm -rf src
 
+# OpenCV installation
+RUN wget https://github.com/opencv/opencv/archive/3.4.10.zip \
+&& unzip 3.4.10.zip \
+&& mkdir /opencv-3.4.10/cmake_binary \
+&& cd /opencv-3.4.10/cmake_binary \
+&& cmake -DWITH_QT=OFF \
+        -DWITH_OPENGL=ON \
+        -DFORCE_VTK=OFF \
+        -DWITH_TBB=ON \
+        -DWITH_GDAL=ON \
+        -DWITH_XINE=ON \
+        -DBUILD_EXAMPLES=OFF \
+        -DENABLE_PRECOMPILED_HEADERS=OFF .. \
+&& make install \
+&& rm /3.4.10.zip \
+&& rm -r /opencv-3.4.10
+
 ENV ROBOT=youbot-brsu-4
 ENV ROBOT_ENV=brsu-c025
 
