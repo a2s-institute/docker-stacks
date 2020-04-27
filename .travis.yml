@@ -43,12 +43,12 @@ jobs:
         - docker-compose -f industrial/docker-compose.yml build kinetic_base
         - docker images
         - docker push bitbots/bitbots-industrial:kinetic-base
-      - stage: deploy
-        name: "Industrial melodic base image"
-        script:
-          - docker-compose -f industrial/docker-compose.yml build melodic_base
-          - docker images
-          - docker push bitbots/bitbots-industrial:melodic-base
+    - stage: deploy
+      name: "Industrial melodic base image"
+      script:
+        - docker-compose -f industrial/docker-compose.yml build melodic_base
+        - docker images
+        - docker push bitbots/bitbots-industrial:melodic-base
 
 
 notifications:
