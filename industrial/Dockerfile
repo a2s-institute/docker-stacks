@@ -51,6 +51,7 @@ WORKDIR /$ROS_DISTRO
 RUN wstool init --shallow src \
     && wstool merge -t src https://raw.githubusercontent.com/b-it-bots/mas_industrial_robotics/$ROS_DISTRO/repository.rosinstall \
     && wstool update -t src \
+    && git clone -b $ROS_DISTRO https://github.com/b-it-bots/mas_industrial_robotics.git src/mas_industrial_robotics \
     && rosdep update -q \
     && sudo apt-get update \
     && rosdep install --from-paths src --ignore-src --rosdistro=$ROS_DISTRO --skip-keys rosplan_demos -y \
