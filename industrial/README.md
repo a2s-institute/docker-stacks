@@ -18,9 +18,13 @@ Advantages of using this image over a local build:
   Note: All files and folders available in the \<host file system path\> will be mapped to the \<mounted directory\> (/kinetic or /melodic) inside the container
   * Modify the nvidia-390 with the version of nvidia driver installed in your system
   * $HOME/.rviz:/home/<ros_dist>_user/.rviz is optional. Favorite Rviz configurations which are stored in your local file system will be mounted onto your docker container
-* Then run the following command from the folder containing the start-container.yml file. This spins up a container based on the bitbots/bitbots-industrial:<ros_dist>-base image
+* Then run the following command from the folder containing the start-container.yml file. This spins up two containers based on the kinetic and melodic bitbots/bitbots-industrial:<ros_dist>-base image
 ```sh
-docker-compose -f start-container.yml up
+docker-compose -f industrial/start-container.yml up
+```
+To just start a single container for either melodic or kinetic, use
+```sh
+docker-compose -f industrial/start-container.yml up ros_<ros_dist>_container
 ```
 Note: The very first time you run this command, the latest image will be pulled from docker-hub
 * To run commands inside the container, open multiple bash sessions in new terminal windows using
@@ -35,7 +39,7 @@ ls
 In a similar manner, the catkin_workspace can be created and built, and different ROS nodes can be launched from different bash terminals of the same container
 * To stop and remove the container, use ctrl+c followed by 
 ```sh
-docker-compose -f start-container.yml down
+docker-compose -f industrial/start-container.yml down
 ```
 
 ## 2. Manually building the image 
@@ -49,6 +53,5 @@ To build a single image by manually specifying the build args use following comm
 ```sh
 docker build --build-arg ROS_DISTRO=<ros-distribution> --build-arg UID=$(id -u) --build-arg GID=$(id -g) --build-arg UNAME=$USER <image name> .
 ```
-or 
 
 * The locally built image can then used along with the existing docker-compose file start-container.yml by modifying the image name from `bitbots/bitbots-industrial:<ros_dist>-base` to \<image name\> and following the previously mentioned instructions.
