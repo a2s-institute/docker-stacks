@@ -3,10 +3,14 @@ services:
   kinetic_base:
     build:
       dockerfile: Dockerfile
-      context: ./kinetic/
+      context: .
+      args:
+        ROS_DISTRO: kinetic
     image: bitbots/bitbots-industrial:kinetic-base
   melodic_base:
     build:
       dockerfile: Dockerfile
-      context: ./melodic/
+      context: .
+      args:
+        ROS_DISTRO: melodic
     image: bitbots/bitbots-industrial:melodic-base
