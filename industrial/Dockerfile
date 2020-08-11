@@ -11,7 +11,7 @@ ENV NVIDIA_DRIVER_CAPABILITIES \
     ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics
 
 RUN apt update -qq \
-    && sudo apt-get install -y -qq software-properties-common \
+    && sudo apt install -y -qq software-properties-common \
     curl \
     figlet \
     wget \
@@ -29,12 +29,12 @@ RUN sudo rm -rf /etc/ros/rosdep/sources.list.d/* \
 # install dependencies
 RUN apt update
 RUN apt install -y libopencv-dev ros-$ROS_DISTRO-vision-opencv \
-      yasm libjpeg-dev libavcodec-dev libavformat-dev libswscale-dev \
-      libdc1394-22-dev libv4l-dev python-dev python-numpy libtbb-dev \
-      libqt4-dev libgtk2.0-dev libmp3lame-dev libopencore-amrnb-dev \
-      libopencore-amrwb-dev libtheora-dev libvorbis-dev libxvidcore-dev \
-      x264 v4l-utils pkg-config
-RUN apt-get install -y curl build-essential checkinstall cmake
+        yasm libjpeg-dev libavcodec-dev libavformat-dev libswscale-dev \
+        libdc1394-22-dev libv4l-dev python-dev python-numpy libtbb-dev \
+        libqt4-dev libgtk2.0-dev libmp3lame-dev libopencore-amrnb-dev \
+        libopencore-amrwb-dev libtheora-dev libvorbis-dev libxvidcore-dev \
+        x264 v4l-utils pkg-config
+RUN apt install -y curl build-essential checkinstall cmake
 
 WORKDIR /$ROS_DISTRO
 
@@ -43,14 +43,14 @@ RUN wstool init --shallow src \
     && wstool update -t src \
     && git clone -b $ROS_DISTRO https://github.com/b-it-bots/mas_industrial_robotics.git src/mas_industrial_robotics \
     && rosdep update -q \
-    && sudo apt-get update \
+    && sudo apt update \
     && rosdep install --from-paths src --ignore-src --rosdistro=$ROS_DISTRO --skip-keys rosplan_demos -y \
     && rm -rf src
 
 # Install mesa libary for intel graphic
 RUN \
-  apt-get update && \
-  apt-get -y install libgl1-mesa-glx libgl1-mesa-dri && \
+  apt update && \
+  apt -y install libgl1-mesa-glx libgl1-mesa-dri && \
   rm -rf /var/lib/apt/lists/*
 
 ENV ROBOT=youbot-brsu-4
