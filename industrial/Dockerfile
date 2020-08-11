@@ -27,13 +27,13 @@ RUN sudo rm -rf /etc/ros/rosdep/sources.list.d/* \
     && sudo pip install catkin_pkg empy
 
 # install dependencies
-RUN apt-get update
-RUN apt-get install -y libopencv-dev ros-$ROS_DISTRO-vision-opencv && \
-    yasm libjpeg-dev libavcodec-dev libavformat-dev libswscale-dev && \
-    libdc1394-22-dev libv4l-dev python-dev python-numpy libtbb-dev && \
-    libqt4-dev libgtk2.0-dev libmp3lame-dev libopencore-amrnb-dev && \
-    libopencore-amrwb-dev libtheora-dev libvorbis-dev libxvidcore-dev && \
-    x264 v4l-utils pkg-config
+RUN apt update
+RUN apt install -y libopencv-dev ros-$ROS_DISTRO-vision-opencv \
+      yasm libjpeg-dev libavcodec-dev libavformat-dev libswscale-dev \
+      libdc1394-22-dev libv4l-dev python-dev python-numpy libtbb-dev \
+      libqt4-dev libgtk2.0-dev libmp3lame-dev libopencore-amrnb-dev \
+      libopencore-amrwb-dev libtheora-dev libvorbis-dev libxvidcore-dev \
+      x264 v4l-utils pkg-config
 RUN apt-get install -y curl build-essential checkinstall cmake
 
 WORKDIR /$ROS_DISTRO
