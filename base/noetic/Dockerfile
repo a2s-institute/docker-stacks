@@ -3,6 +3,7 @@ FROM ros:noetic
 RUN apt update -qq && \
     apt upgrade -y -qq && \
     apt install --yes \ 
+      git \
       vim \
       python3-pip \
     && apt clean && \
