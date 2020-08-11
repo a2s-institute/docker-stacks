@@ -2,9 +2,11 @@ FROM ros:noetic
 
 RUN apt update -qq && \
     apt upgrade -y -qq && \
-    apt install vim \
-    python3-pip \
-    && rm -rf /var/lib/apt/lists/*
+    apt install --yes 
+      vim \
+      python3-pip \
+    && apt clean && \
+    rm -rf /var/lib/apt/lists/*
 
 RUN pip3 install --no-cache-dir catkin-tools && \
     pip3 install --no-cache-dir catkin-lint && \
