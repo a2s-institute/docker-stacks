@@ -14,3 +14,10 @@ services:
       args:
         ROS_DISTRO: melodic
     image: bitbots/bitbots-industrial:melodic-base
+  noetic_base:
+    build:
+      dockerfile: Dockerfile
+      context: .
+      args:
+        ROS_DISTRO: noetic
+    image: bitbots/bitbots-industrial:noetic-base
