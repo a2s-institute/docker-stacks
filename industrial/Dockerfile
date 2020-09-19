@@ -93,7 +93,7 @@ RUN mkdir -p $WSDIR/src/external_mounts && \
 
 USER $UNAME
 # use melodic devel instead of kinetic
-RUN cd $WSDIR/src/mas_perception_msgs && git checkout a0e8819
+RUN cd $WSDIR/src/mas_perception_msgs && git checkout ca9e5d7
 # this package is not integrated to mas_industrial_robotics yet
 #RUN cd $WSDIR && . /opt/ros/$ROS_DISTRO/setup.sh && catkin build mir_object_recognition
 
