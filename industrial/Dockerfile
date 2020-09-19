@@ -23,8 +23,13 @@ RUN apt update -qq \
 RUN sudo rm -rf /etc/ros/rosdep/sources.list.d/* \
     && sudo rosdep init -q \
     && rosdep update -q \
-    && sudo apt install -y -qq python-rosinstall python-rosinstall-generator build-essential \
-    && sudo pip install catkin_pkg empy
+    && sudo apt install -y -qq build-essential 
+
+RUN if [ "$ROS_DISTRO" = "noetic" ]; then sudo apt install -y -qq python3-rosinstall python3-rosinstall-generator; \
+    else sudo apt install -y -qq python3-rosinstall python3-rosinstall-generator; fi
+
+RUN if [ "$ROS_DISTRO" = "noetic" ]; then sudo pip3 install --no-cache-dir catkin_pkg empy; \
+    else sudo pip install --no-cache-dir catkin_pkg empy; fi
 
 # install dependencies
 RUN apt update
