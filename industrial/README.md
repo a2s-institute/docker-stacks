@@ -8,16 +8,62 @@ Advantages of using this image over a local build:
 * No user rights issues when creating/cloning folders from within the container
 * ROS nodes and ROS master can be launched from within the container and can also communicate with nodes/clients running outside the container, on the local Ubuntu machine
 * Supports GUI rendering for *gazebo* and *rviz*
-* Source code for the ROS packages is stored locally and is only volume mounted in the container
+* The container already has source codes pulled inside and you can run or edit the codes but they are ephermal and will be destroyed when the image is rebuild. 
+* If you want your local direcotries to be mounted instead, you can mount them to `external_mounts` under `$HOME/<ROS_DISTRO>/src/external_mounts`.
 
 ## 1. Using docker-compose file start-container.yml
 
 * start-container.yml file runs services to spawn up containers based on *bitbots/bitbots-industrial:kinetic-base* and *bitbots/bitbots-industrial:melodic-base* images
 * Download the sample start-container.yml file from this repository and modify the following based on your requirements:
-  * Change the \<host file system path\> (/home/iswariya/Documents/Robocup) to the folder where you have cloned the MAS industrial robotics repository and where you want your catkin workspace to be created
-  Note: All files and folders available in the \<host file system path\> will be mapped to the \<mounted directory\> (/kinetic or /melodic) inside the container
-  * Modify the nvidia-390 with the version of nvidia driver installed in your system
+  * Accelartor
+
+    To enable graphic accelarators e.g. nvidia, add the following to `start-container.yaml`
+
+    ```
+    volumes:
+      - /usr/lib32/nvidia-390:/usr/lib32/nvidia-390  # provide locally installed -
+      - /usr/lib/nvidia-390:/usr/lib/nvidia-390      # - nvidia driver version
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - LD_LIBRARY_PATH=/usr/lib/nvidia-390:/usr/lib32/nvidia-390
+    ```
+    **NOTE**
+
+    Modify the nvidia-390 with the version of nvidia driver installed in your system
+
+
   * $HOME/.rviz:/home/<ros_dist>_user/.rviz is optional. Favorite Rviz configurations which are stored in your local file system will be mounted onto your docker container
+  * Configuring `external_mounts`
+    
+    For example, we want to mount `mas_industrial_robotics` and `mas_perception_msgs` to the container, add the followings under `volume`:
+
+    ```
+    volumes:
+      - /home/mhwasil/ros_catkin_ws/src/b-it-bots/mas_industrial_robotics:/home/robocup/kinetic/src/external_mounts/mas_industrial_robotics:rw
+      - /home/mhwasil/ros_catkin_ws/src/b-it-bots/mas_perception_msgs:/home/robocup/kinetic/src/external_mounts/mas_perception_msgs:rw
+    ```
+
+    **NOTE**
+
+    Any file you change inside `mas_industrial_robotics and mas_perception_msgs` reflects the one iside the docker. So you can use you favorite IDE like vscode, atom, etc to work on your project.
+
+  ---
+
+  **NOTE**
+
+  Some packages may have been prebuilt in the container, so you need to clean them first by `catkin clean <package_name>`.
+
+  You should also catkin ignore or remove the packages that have been replaced with the ones from your local PC. For example, ignore  `mas_industrial_robotics` and `mas_perception_msgs`:
+  ```
+  roscd mas_industrial_robotics
+  touch CATKIN_IGNORE
+
+  roscd mas_perception_msgs
+  touch CATKIN_IGNORE
+  ```
+
+  ---
+
 * Then run the following command from the folder containing the start-container.yml file. This spins up two containers based on the kinetic and melodic bitbots/bitbots-industrial:<ros_dist>-base image
 ```sh
 docker-compose -f industrial/start-container.yml up

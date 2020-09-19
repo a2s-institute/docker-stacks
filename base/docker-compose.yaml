@@ -10,3 +10,8 @@ services:
       dockerfile: melodic/Dockerfile
       context: .
     image: bitbots/bitbots-base:melodic
+  noetic_base:
+    build:
+      dockerfile: noetic/Dockerfile
+      context: .
+    image: bitbots/bitbots-base:noetic
