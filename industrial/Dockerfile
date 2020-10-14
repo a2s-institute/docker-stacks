@@ -20,7 +20,8 @@ RUN apt-get update -qq \
       nmap \
       unzip \
       gcc-multilib \
-      g++-multilib 
+      g++-multilib \
+      python3-pip
 
 RUN pip install --upgrade pip
 
