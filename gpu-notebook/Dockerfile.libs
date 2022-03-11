@@ -1,0 +1,29 @@
+LABEL maintainer="b-it-bots <robotics@h-brs.de>"
+
+#Fix opencv libGl
+USER root
+RUN apt-get update
+RUN apt-get install -y libgl1-mesa-dev
+
+USER $NB_USER
+
+COPY requirements.txt /tmp/requirements.txt
+RUN pip install --no-cache-dir -r /tmp/requirements.txt
+
+# install pytorch
+RUN pip install --upgrade pip 
+RUN pip install torch==1.11.0+cu113 torchvision==0.12.0+cu113 torchaudio==0.11.0+cu113 -f https://download.pytorch.org/whl/cu113/torch_stable.html
+
+# Install nbzip
+RUN pip install --no-cache-dir nbzip==0.1.0 && \
+    jupyter serverextension enable  --sys-prefix --py nbzip && \
+    jupyter nbextension     install --sys-prefix --py nbzip && \
+    jupyter nbextension     enable  --sys-prefix --py nbzip
+
+# Install graphviz via conda
+RUN conda install graphviz
+
+USER root
+RUN rm /tmp/requirements.txt
+
+USER $NB_USER
