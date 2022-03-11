@@ -87,7 +87,7 @@ function gpu_notebook {
   bash generate_dockerfile.sh
 
   docker build -t $GPU_NOTEBOOK_TAG --build-arg ROOT_CONTAINER=nvidia/cuda:$CUDA_VERSION .build/ 
-  if docker run --gpus all -it --rm -d -p 8880:8888 $GPU_NOTEBOOK_TAG ; then echo "$GPU_NOTEBOOK_TAG is running"; else echo "Failed to run $GPU_NOTEBOOK_TAG" && exit 1; fi
+  if docker run -it --rm -d -p 8880:8888 $GPU_NOTEBOOK_TAG ; then echo "$GPU_NOTEBOOK_TAG is running"; else echo "Failed to run $GPU_NOTEBOOK_TAG" && exit 1; fi
 
   if [ "$PUBLISH" = "all" ]
   then
