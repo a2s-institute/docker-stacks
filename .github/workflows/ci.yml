@@ -59,7 +59,7 @@ jobs:
       run: docker images
 
   deploy:
-    name: Build and Deploy Image
+    name: Build and Publish Image
     needs: setup
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
