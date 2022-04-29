@@ -53,7 +53,7 @@ jobs:
       run: |
         OWNER=${{ needs.setup.outputs.owner }}
 
-        bash build_and_deploy.sh --registry ghcr.io --publish ""
+        bash build_and_publish.sh --registry ghcr.io --publish ""
 
     - name: Docker image list
       run: docker images
@@ -83,7 +83,7 @@ jobs:
       run: |
         OWNER=${{ needs.setup.outputs.owner }}
 
-        bash build_and_deploy.sh --registry ghcr.io --publish "all"
+        bash build_and_publish.sh --registry ghcr.io --publish "all"
 
     - name: Docker image list
       run: docker images
