@@ -100,6 +100,7 @@ function build_and_publish_gpu_notebook {
   else
     echo "None is published"
   fi
+  cd ..
 }
 
 function build_and_publish_base_image {
