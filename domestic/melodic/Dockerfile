@@ -1,4 +1,4 @@
-FROM bitbots/bitbots-base:melodic
+FROM ghcr.io/b-it-bots/docker/bitbots-base:melodic
 
 COPY base.rosinstall /melodic/base.rosinstall
 
@@ -22,5 +22,4 @@ WORKDIR /melodic
 RUN catkin config --init && \
     catkin config --extend /opt/ros/melodic && \
     catkin config --install --install-space /opt/ros/mas_stable && \
-    catkin build -c && \
     rm -rf /melodic/
