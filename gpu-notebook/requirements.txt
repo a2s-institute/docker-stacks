@@ -26,3 +26,4 @@ pydot
 pyyaml
 pypdf2
 pdfkit
+open3d==0.14.1
