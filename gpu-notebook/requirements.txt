@@ -25,5 +25,5 @@ pyyaml
 pypdf2
 pdfkit
 scipy==1.8.1
-tensorflow==2.8.0
-open3d==0.14.1
+tensorflow
+open3d==0.16.0
