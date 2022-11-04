@@ -26,14 +26,14 @@ RUN pip install --no-cache-dir nbzip==0.1.0 && \
 # Install graphviz via conda
 RUN conda install graphviz
 
+USER root
+# Install nvtop to monitor the gpu tasks
 #Install Google Edge TPU Compiler
-RUN curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
-RUN echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" | sudo tee /etc/apt/sources.list.d/coral-edgetpu.list
+RUN curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+RUN echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" | tee /etc/apt/sources.list.d/coral-edgetpu.list
 RUN apt-get update
 RUN apt-get install edgetpu-compiler
 
-USER root
-# Install nvtop to monitor the gpu tasks
 RUN apt-get update && \
     apt-get install -y cmake libncurses5-dev libncursesw5-dev git && \
     rm -rf /var/lib/apt/lists/*
