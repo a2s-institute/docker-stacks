@@ -26,6 +26,9 @@ RUN pip install --no-cache-dir nbzip==0.1.0 && \
 # Install graphviz via conda
 RUN conda install graphviz
 
+#Install Google Edge TPU Compiler
+RUN apt-get install edgetpu-compiler
+
 USER root
 # Install nvtop to monitor the gpu tasks
 RUN apt-get update && \
