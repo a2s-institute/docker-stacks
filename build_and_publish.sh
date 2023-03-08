@@ -15,6 +15,7 @@ then
   echo "-d, --deployment              deployment (dev or prod), default: is empty or not published to registry"
   echo "-r, --registry                container registry e.g. ghcr.io for GitHub container registry, default: docker hub"
   echo "-p, --publish                 option whether to publish <all> or <latest> (default: all), all means publish all tags"
+  echo "-i, --image                   image to build base|domestic|gpu-notebook|all (default: all)"
   exit 0
 fi
 
@@ -29,6 +30,7 @@ while test $# -gt 0; do
       echo "-d, --deployment          deployment (dev or prod), default: is empty or not published to registry"
       echo "-r, --registry            container registry e.g. ghcr.io for GitHub container registry, default: docker hub"
       echo "-p, --publish             option whether to publish <all> tags or <latest> tags only (default: all)"
+      echo "-i, --image               image to build domestic|gpu-notebook|all (default: all)"
       exit 0
       ;;
     -c|--cuda)
@@ -48,6 +50,11 @@ while test $# -gt 0; do
       ;;
     -p|--publish)
       PUBLISH="$2"
+      shift
+      shift
+      ;;
+    -i|--image)
+      IMAGE="$2"
       shift
       shift
       ;;
@@ -79,14 +86,24 @@ echo "Container registry/owner = $CONTAINER_REG_OWNER"
 echo "Deployment: $DEPLOYMENT"
 
 function build_and_publish_gpu_notebook {
-  cd gpu-notebook
-  GPU_NOTEBOOK_TAG=$CONTAINER_REG_OWNER/gpu-notebook:$CUDA_VERSION 
+  cd gpu-base-notebook
+  GPU_BASE_NOTEBOOK_TAG=$CONTAINER_REG_OWNER/gpu-base-notebook:$CUDA_VERSION
+  GPU_NOTEBOOK_TAG=$CONTAINER_REG_OWNER/gpu-notebook:$CUDA_VERSION
 
-  #prepare docker file
+  # prepare docker file gpu-base-notebook
   bash generate_dockerfile.sh
 
-  docker build -t $GPU_NOTEBOOK_TAG --build-arg ROOT_CONTAINER=nvidia/cuda:$CUDA_VERSION .build/ 
-  if docker run -it --rm -d -p 8880:8888 $GPU_NOTEBOOK_TAG;
+  docker build -t $GPU_BASE_NOTEBOOK_TAG --build-arg ROOT_CONTAINER=nvidia/cuda:$CUDA_VERSION .build/
+  docker build -t $GPU_NOTEBOOK_TAG --build-arg BASE_CONTAINER=$GPU_BASE_NOTEBOOK_TAG ../gpu-notebook/
+
+  if docker run -it --rm -d -p 8880:8888 $GPU_BASE_NOTEBOOK_TAG;
+  then
+    echo "$GPU_BASE_NOTEBOOK_TAG is running";
+  else
+    echo "Failed to run $GPU_BASE_NOTEBOOK_TAG" && exit 1;
+  fi
+
+  if docker run -it --rm -d -p 8881:8888 $GPU_NOTEBOOK_TAG;
   then
     echo "$GPU_NOTEBOOK_TAG is running";
   else
@@ -95,6 +112,9 @@ function build_and_publish_gpu_notebook {
 
   if [ "$PUBLISH" = "all" ]
   then
+    echo "Pushing $GPU_BASE_NOTEBOOK_TAG"
+    docker push $GPU_BASE_NOTEBOOK_TAG
+
     echo "Pushing $GPU_NOTEBOOK_TAG"
     docker push $GPU_NOTEBOOK_TAG
   else
@@ -174,6 +194,16 @@ function build_and_publish_domestic_image {
 }
 
 # build and push docker image
-build_and_publish_gpu_notebook
-build_and_publish_base_image
-build_and_publish_domestic_image
+echo "Building and publishing $IMAGE"
+if [ "$IMAGE" = "gpu-notebook" ]
+then
+  build_and_publish_gpu_notebook
+elif [ "$IMAGE" = "domestic" ]
+then
+  build_and_publish_base_image
+  build_and_publish_domestic_image
+else
+  build_and_publish_gpu_notebook
+  build_and_publish_base_image
+  build_and_publish_domestic_image
+fi
