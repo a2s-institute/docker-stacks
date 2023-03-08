@@ -1,12 +1,11 @@
----
-name: CI 
+name: Manual workflow
 on:
-  pull_request:
-  push:
-    branches:
-      - master
-  schedule:
-    - cron: "0 1 * * 0"
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Image to build'
+        required: true
+        default: 'gpu-notebook'
 
 jobs:
   setup:
@@ -31,66 +30,11 @@ jobs:
 
         echo "::set-output name=owner::ghcr.io/b-it-bots/docker"
 
-  # split jobs to avoid using large storage capacity (limited by gh)
-  build-gpu-notebook:
-    name: Build gpu-notebook image
-    needs: setup
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: Set up Docker Buildx
-      id: buildx
-      uses: docker/setup-buildx-action@v1
-
-    - name: Install sphinx dependencies
-      run: |
-        sudo pip3 install --upgrade pip
-
-    - name: Build image
-      id: build_image
-      run: |
-        OWNER=${{ needs.setup.outputs.owner }}
-
-        bash build_and_publish.sh --registry ghcr.io --publish "" --image gpu-notebook
-
-    - name: Docker image list
-      run: docker images
-
-  build-domestic:
-    name: Build domestic image
-    needs: setup
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: Set up Docker Buildx
-      id: buildx
-      uses: docker/setup-buildx-action@v1
-
-    - name: Install sphinx dependencies
-      run: |
-        sudo pip3 install --upgrade pip
-
-    - name: Build image
-      id: build_image
-      run: |
-        OWNER=${{ needs.setup.outputs.owner }}
-
-        bash build_and_publish.sh --registry ghcr.io --publish "" --image domestic
-
-    - name: Docker image list
-      run: docker images
-
   publish-gpu-notebook:
     name: Build and publish gpu-notebook
+    if: github.event.inputs.branch == 'gpu-notebook'
     needs: setup
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
 
     steps:
     - uses: actions/checkout@v2
@@ -118,9 +62,9 @@ jobs:
 
   publish-domestic:
     name: Build and publish domestic
+    if: github.event.inputs.branch == 'domestic'
     needs: setup
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
 
     steps:
     - uses: actions/checkout@v2

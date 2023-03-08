@@ -1,0 +1,22 @@
+LABEL maintainer="b-it-bots <robotics@h-brs.de>"
+
+# Install mesa to fix opencv libGl
+USER root
+RUN apt-get update
+RUN apt-get install -y libgl1-mesa-dev vim htop
+
+USER $NB_USER
+
+# Update jupyterhub and use the version that is used in z2jh version
+RUN pip install --no-cache-dir jupyterhub==1.5.0
+
+# install pytorch
+RUN pip install --upgrade pip 
+
+# Install nbzip
+RUN pip install --no-cache-dir nbzip==0.1.0 && \
+    jupyter serverextension enable  --sys-prefix --py nbzip && \
+    jupyter nbextension     install --sys-prefix --py nbzip && \
+    jupyter nbextension     enable  --sys-prefix --py nbzip
+
+USER $NB_USER
