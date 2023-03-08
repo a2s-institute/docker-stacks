@@ -76,20 +76,20 @@ echo "
 " >> $DOCKERFILE
 cat $STACKS_DIR/minimal-notebook/Dockerfile | grep -v BASE_CONTAINER >> $DOCKERFILE
 
-echo "
-############################################################################
-################# Dependency: jupyter/scipy-notebook #######################
-############################################################################
-" >> $DOCKERFILE
-cat $STACKS_DIR/scipy-notebook/Dockerfile | grep -v BASE_CONTAINER >> $DOCKERFILE
+#echo "
+#############################################################################
+################## Dependency: jupyter/scipy-notebook #######################
+#############################################################################
+#" >> $DOCKERFILE
+#cat $STACKS_DIR/scipy-notebook/Dockerfile | grep -v BASE_CONTAINER >> $DOCKERFILE
 
-# install b-it-bots packages
-echo "
-############################################################################
-############################ b-it-bots packages ############################
-############################################################################
-" >> $DOCKERFILE
-cat Dockerfile.libs >> $DOCKERFILE
+## install b-it-bots packages
+#echo "
+#############################################################################
+############################# b-it-bots packages ############################
+#############################################################################
+#" >> $DOCKERFILE
+#cat Dockerfile.libs >> $DOCKERFILE
 
 # Set environment variables
 export JUPYTER_UID=$(id -u)
