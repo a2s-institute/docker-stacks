@@ -1,3 +1,4 @@
+jupyterhub
 jupyterlab
 keras
 ipywidgets
@@ -28,3 +29,5 @@ pdfkit
 scipy==1.8.1
 tensorflow
 open3d==0.16.0
+ftfy
+timm
