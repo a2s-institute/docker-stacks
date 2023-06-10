@@ -21,6 +21,9 @@ RUN apt-get update && \
 
 USER $NB_USER
 
+# install gh cli
+RUN conda install gh --channel conda-forge
+
 COPY requirements.txt /tmp/requirements.txt
 RUN pip install --no-cache-dir -r /tmp/requirements.txt
 
