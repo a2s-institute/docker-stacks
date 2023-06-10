@@ -4,29 +4,22 @@ FROM $BASE_CONTAINER
 
 LABEL maintainer="b-it-bots <robotics@h-brs.de>"
 
-# Install mesa to fix opencv libGl
 USER root
-RUN apt-get update
-RUN apt-get install -y libgl1-mesa-dev vim htop curl software-properties-common
 
 #Install Google Edge TPU Compiler
 RUN curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
 RUN echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" | tee /etc/apt/sources.list.d/coral-edgetpu.list
-RUN apt-get update
-RUN apt-get install edgetpu-compiler
-
-RUN apt-get update && \
-    apt-get install -y cmake libncurses5-dev libncursesw5-dev git sox && \
-    rm -rf /var/lib/apt/lists/*
 
 # Install nvtop to monitor the gpu tasks
 RUN add-apt-repository ppa:flexiondotorg/nvtop
-RUN apt install -y nvtop
+
+RUN apt-get update && \
+    apt-get install -y libgl1-mesa-dev vim htop curl software-properties-common && \
+    apt-get install -y cmake libncurses5-dev libncursesw5-dev git sox && \
+    apt-get install -y edgetpu-compiler nvtop zip && \
+    rm -rf /var/lib/apt/lists/*
 
 USER $NB_USER
-
-# Update jupyterhub and use the version that is used in z2jh version
-RUN pip install --no-cache-dir jupyterhub==1.5.0
 
 COPY requirements.txt /tmp/requirements.txt
 RUN pip install --no-cache-dir -r /tmp/requirements.txt
@@ -54,4 +47,3 @@ EXPOSE 8888
 # Configure container startup
 ENTRYPOINT ["tini", "-g", "--"]
 CMD ["start-notebook.sh"]
-
