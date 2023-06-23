@@ -1,18 +1,12 @@
-[<!--lint ignore no-dead-urls-->![Build Status](https://github.com/b-it-bots/docker/workflows/CI/badge.svg)](https://github.com/b-it-bots/docker/actions?workflow=CI)
+[<!--lint ignore no-dead-urls-->![Build Status](https://github.com/a2s-institute/docker-stacks/workflows/CI/badge.svg)](https://github.com/a2s-institute/docker-stacks/actions?workflow=CI)
 
-# b-it-bots Docker images
+# a2s-institute docker images
 
-You can easily create all images using `docker-compose`:
-
-```
-docker-compose build
-```
-
-# GPU Notebook
+## GPU Notebook
 
 This image contains several packages for deep learning projects with NVidia GPU support.
 
-* Build this image
+* Build notebook image with gpu support
   ```
   bash build_and_publish.sh --cuda 11.3.1-cudnn8-runtime-ubuntu20.04 --registry ghcr.io --publish ""
   ```
