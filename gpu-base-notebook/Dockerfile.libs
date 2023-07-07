@@ -1,22 +1,15 @@
-LABEL maintainer="b-it-bots <robotics@h-brs.de>"
+LABEL maintainer="A2S Institute <e2x@inf.h-brs.de>"
 
 # Install mesa to fix opencv libGl
 USER root
-RUN apt-get update
-RUN apt-get install -y libgl1-mesa-dev vim htop
 
-USER $NB_USER
+# Install nvtop to monitor the gpu tasks
+RUN add-apt-repository ppa:flexiondotorg/nvtop
 
-# Update jupyterhub and use the version that is used in z2jh version
-RUN pip install --no-cache-dir jupyterhub==1.5.0
-
-# install pytorch
-RUN pip install --upgrade pip 
-
-# Install nbzip
-RUN pip install --no-cache-dir nbzip==0.1.0 && \
-    jupyter serverextension enable  --sys-prefix --py nbzip && \
-    jupyter nbextension     install --sys-prefix --py nbzip && \
-    jupyter nbextension     enable  --sys-prefix --py nbzip
+RUN apt-get update && \
+    apt-get install -y libgl1-mesa-dev vim htop curl software-properties-common && \
+    apt-get install -y cmake libncurses5-dev libncursesw5-dev git sox && \
+    apt-get install -y nvtop zip && \
+    rm -rf /var/lib/apt/lists/*
 
 USER $NB_USER
