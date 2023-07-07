@@ -78,7 +78,7 @@ then
   CONTAINER_REG_OWNER=bitbots
 else
   echo "Using $CONTAINER_REGISTRY registry"
-  OWNER=b-it-bots/docker
+  OWNER=a2s-institute/docker-stacks
   CONTAINER_REG_OWNER=$CONTAINER_REGISTRY/$OWNER
 fi
 
