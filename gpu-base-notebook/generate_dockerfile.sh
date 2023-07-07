@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 cd $(cd -P -- "$(dirname -- "$0")" && pwd -P)
 
-# adapted from https://github.com/iot-salzburg/gpu-jupyter/blob/master/generate-Dockerfile.sh
+# adapted from https://github.com/iot-salzburg/gpu-jupyter/blob/main/generate-Dockerfile.sh
 
 # Set the path of the generated Dockerfile
 export DOCKERFILE=".build/Dockerfile"
 export STACKS_DIR=".build/docker-stacks"
-# please test the build of the commit in https://github.com/jupyter/docker-stacks/commits/master in advance
-export HEAD_COMMIT="8f0a73e76d17ce318681dad27ffa1cb6509c3e19"
+# please test the build of the commit in https://github.com/jupyter/docker-stacks/commits/main in advance
+export HEAD_COMMIT="3d1dfb045378df107c60051fd4b4e96f80ac5d8c"
 
 while [[ "$#" -gt 0 ]]; do case $1 in
   -c|--commit) HEAD_COMMIT="$2"; shift;;
@@ -19,7 +19,7 @@ if [[ "$HELP" == 1 ]]; then
     echo "Help for ./generate-Dockerfile.sh:"
     echo "Usage: $0 [parameters]"
     echo "    -h|--help: Show this help."
-    echo "    -c|--commit: Set the head commit of the jupyter/docker-stacks submodule (https://github.com/jupyter/docker-stacks/commits/master). default: $HEAD_COMMIT."
+    echo "    -c|--commit: Set the head commit of the jupyter/docker-stacks submodule (https://github.com/jupyter/docker-stacks/commits/main). default: $HEAD_COMMIT."
     exit 21
 fi
 
@@ -36,7 +36,7 @@ else
   echo "$HEAD"
   if [[ "$GOT_HEAD" == "false" ]]; then
     echo "Error: The given sha-commit is invalid."
-    echo "Usage: $0 -c [sha-commit] # set the head commit of the docker-stacks submodule (https://github.com/jupyter/docker-stacks/commits/master)."
+    echo "Usage: $0 -c [sha-commit] # set the head commit of the docker-stacks submodule (https://github.com/jupyter/docker-stacks/commits/main)."
     echo "Exiting"
     exit 2
   else
