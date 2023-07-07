@@ -31,3 +31,4 @@ tensorflow
 open3d==0.16.0
 ftfy
 timm
+transformers
