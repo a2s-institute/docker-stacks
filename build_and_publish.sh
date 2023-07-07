@@ -11,7 +11,7 @@ then
   echo " "
   echo "options:"
   echo "-h, --help                    show brief help"
-  echo "-c, --cuda                    cuda image tag e.g. 11.3.1-cudnn8-runtime-ubuntu20.04, default: 11.3.1-cudnn8-runtime-ubuntu20.04"
+  echo "-c, --cuda                    cuda image tag e.g. 11.8.0-cudnn8-runtime-ubuntu22.04, default: 11.8.0-cudnn8-runtime-ubuntu22.04"
   echo "-d, --deployment              deployment (dev or prod), default: is empty or not published to registry"
   echo "-r, --registry                container registry e.g. ghcr.io for GitHub container registry, default: docker hub"
   echo "-p, --publish                 option whether to publish <all> or <latest> (default: all), all means publish all tags"
@@ -26,7 +26,7 @@ while test $# -gt 0; do
       echo " "
       echo "options:"
       echo "-h, --help                show brief help"
-      echo "-c, --cuda                cuda image tag e.g. 11.3.1-cudnn8-runtime-ubuntu20.04, default: 11.3.1-cudnn8-runtime-ubuntu20.04"
+      echo "-c, --cuda                cuda image tag e.g. 11.8.0-cudnn8-runtime-ubuntu22.04, default: 11.8.0-cudnn8-runtime-ubuntu22.04"
       echo "-d, --deployment          deployment (dev or prod), default: is empty or not published to registry"
       echo "-r, --registry            container registry e.g. ghcr.io for GitHub container registry, default: docker hub"
       echo "-p, --publish             option whether to publish <all> tags or <latest> tags only (default: all)"
@@ -67,7 +67,9 @@ done
 if [ -z "$CUDA_VERSION" ]
 then
   echo "Cuda version is not set, setting it to default 11.3.1-cudnn8-runtime-ubuntu20.04"
-  CUDA_VERSION=11.3.1-cudnn8-runtime-ubuntu20.04
+  CUDA_VERSION=11.8.0-cudnn8-runtime-ubuntu22.04
+  # set pytorch cuda accordingly
+  PYTORCH_CUDA=11.8
 fi
 echo "Cuda image version: $CUDA_VERSION"
 
@@ -94,7 +96,7 @@ function build_and_publish_gpu_notebook {
   bash generate_dockerfile.sh
 
   docker build -t $GPU_BASE_NOTEBOOK_TAG --build-arg ROOT_CONTAINER=nvidia/cuda:$CUDA_VERSION .build/
-  docker build -t $GPU_NOTEBOOK_TAG --build-arg BASE_CONTAINER=$GPU_BASE_NOTEBOOK_TAG ../gpu-notebook/
+  docker build -t $GPU_NOTEBOOK_TAG --build-arg BASE_CONTAINER=$GPU_BASE_NOTEBOOK_TAG --build-arg PYTORCH_CUDA=$PYTORCH_CUDA ../gpu-notebook/
 
   if docker run -it --rm -d -p 8880:8888 $GPU_BASE_NOTEBOOK_TAG;
   then
