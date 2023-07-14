@@ -88,11 +88,11 @@ echo "Container registry/owner = $CONTAINER_REG_OWNER"
 echo "Deployment: $DEPLOYMENT"
 
 function build_and_publish_gpu_notebook {
-  cd gpu-base-notebook
+  cd gpu-notebook-base
   GPU_BASE_NOTEBOOK_TAG=$CONTAINER_REG_OWNER/gpu-notebook-base:$CUDA_VERSION
   GPU_NOTEBOOK_TAG=$CONTAINER_REG_OWNER/gpu-notebook:$CUDA_VERSION
 
-  # prepare docker file gpu-base-notebook
+  # prepare docker file gpu-notebook-base
   bash generate_dockerfile.sh
 
   docker build -t $GPU_BASE_NOTEBOOK_TAG --build-arg ROOT_CONTAINER=nvidia/cuda:$CUDA_VERSION .build/
