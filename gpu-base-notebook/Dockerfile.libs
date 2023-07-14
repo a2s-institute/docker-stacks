@@ -3,13 +3,18 @@ LABEL maintainer="A2S Institute <e2x@inf.h-brs.de>"
 # Install mesa to fix opencv libGl
 USER root
 
-# Install nvtop to monitor the gpu tasks
-RUN add-apt-repository ppa:flexiondotorg/nvtop
-
 RUN apt-get update && \
     apt-get install -y libgl1-mesa-dev vim htop curl software-properties-common && \
     apt-get install -y cmake libncurses5-dev libncursesw5-dev git sox && \
     apt-get install -y nvtop zip && \
     rm -rf /var/lib/apt/lists/*
+
+# Install nvtop to monitor the gpu tasks
+RUN add-apt-repository ppa:flexiondotorg/nvtop
+
+RUN /opt/conda/bin/conda clean -afy \
+    && find /opt/conda/ -follow -type f -name '*.a' -delete \
+    && find /opt/conda/ -follow -type f -name '*.pyc' -delete \
+    && find /opt/conda/ -follow -type f -name '*.js.map' -delete
 
 USER $NB_USER
