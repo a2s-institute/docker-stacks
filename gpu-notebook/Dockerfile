@@ -4,7 +4,7 @@ FROM $BASE_CONTAINER
 
 LABEL maintainer="Mohammad Wasil <e2x@inf.h-brs.de>"
 
-ARG PYTORCH_CUDA=11.8
+ARG PYTORCH_CUDA=cu118
 
 USER root
 
@@ -26,11 +26,10 @@ RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r /tmp/requirements.txt
 
 # install pytorch
-RUN conda install pytorch torchvision torchaudio pytorch-cuda=$PYTORCH_CUDA -c pytorch -c nvidia
+RUN pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/$PYTORCH_CUDA
 
 # Install nbzip
-RUN pip install --no-cache-dir nbzip==0.1.0 && \
-    jupyter serverextension enable  --sys-prefix --py nbzip && \
+RUN jupyter serverextension enable  --sys-prefix --py nbzip && \
     jupyter nbextension     install --sys-prefix --py nbzip && \
     jupyter nbextension     enable  --sys-prefix --py nbzip
 
@@ -39,6 +38,12 @@ RUN conda install graphviz
 
 USER root
 RUN rm /tmp/requirements.txt
+
+# clean conda
+RUN /opt/conda/bin/conda clean -afy \
+    && find /opt/conda/ -follow -type f -name '*.a' -delete \
+    && find /opt/conda/ -follow -type f -name '*.pyc' -delete \
+    && find /opt/conda/ -follow -type f -name '*.js.map' -delete
 
 USER $NB_USER
 
