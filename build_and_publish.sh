@@ -95,7 +95,7 @@ function build_and_publish_gpu_notebook {
   # prepare docker file gpu-notebook-base
   bash generate_dockerfile.sh
 
-  docker build -t $GPU_BASE_NOTEBOOK_TAG --build-arg ROOT_CONTAINER=nvidia/cuda:$CUDA_VERSION .build/
+  docker build -t $GPU_BASE_NOTEBOOK_TAG --build-arg BASE_CONTAINER=nvidia/cuda:$CUDA_VERSION .build/
   docker build -t $GPU_NOTEBOOK_TAG --build-arg BASE_CONTAINER=$GPU_BASE_NOTEBOOK_TAG --build-arg PYTORCH_CUDA=$PYTORCH_CUDA ../gpu-notebook/
 
   if docker run -it --rm -d -p 8880:8888 $GPU_BASE_NOTEBOOK_TAG;
