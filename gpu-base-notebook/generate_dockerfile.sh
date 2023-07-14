@@ -7,7 +7,7 @@ cd $(cd -P -- "$(dirname -- "$0")" && pwd -P)
 export DOCKERFILE=".build/Dockerfile"
 export STACKS_DIR=".build/docker-stacks"
 # please test the build of the commit in https://github.com/jupyter/docker-stacks/commits/main in advance
-export HEAD_COMMIT="3d1dfb045378df107c60051fd4b4e96f80ac5d8c"
+export HEAD_COMMIT="7cd3a776fe5963961364818796cbbda065ed5757"
 
 while [[ "$#" -gt 0 ]]; do case $1 in
   -c|--commit) HEAD_COMMIT="$2"; shift;;
@@ -67,7 +67,9 @@ cp $STACKS_DIR/base-notebook/fix-permissions .build/
 cp $STACKS_DIR/base-notebook/start.sh .build/
 cp $STACKS_DIR/base-notebook/start-notebook.sh .build/
 cp $STACKS_DIR/base-notebook/start-singleuser.sh .build/
-chmod 755 .build/*
+cp $STACKS_DIR/base-notebook/docker_healthcheck.py .build/
+cp $STACKS_DIR/base-notebook/.dockerignore .build/
+cp $STACKS_DIR/base-notebook/initial-condarc .build/
 
 echo "
 ############################################################################
@@ -75,21 +77,18 @@ echo "
 ############################################################################
 " >> $DOCKERFILE
 cat $STACKS_DIR/minimal-notebook/Dockerfile | grep -v BASE_CONTAINER >> $DOCKERFILE
+rm $STACKS_DIR/minimal-notebook/Dockerfile
+cp -r $STACKS_DIR/minimal-notebook/* .build/
 
-#echo "
-#############################################################################
-################## Dependency: jupyter/scipy-notebook #######################
-#############################################################################
-#" >> $DOCKERFILE
-#cat $STACKS_DIR/scipy-notebook/Dockerfile | grep -v BASE_CONTAINER >> $DOCKERFILE
+chmod 755 .build/*
 
-## install b-it-bots packages
-#echo "
-#############################################################################
-############################# b-it-bots packages ############################
-#############################################################################
-#" >> $DOCKERFILE
-#cat Dockerfile.libs >> $DOCKERFILE
+echo "
+############################################################################
+################# Dependency: a2s cluster dependencies #####################
+############################################################################
+" >> $DOCKERFILE
+
+cat Dockerfile.libs >> $DOCKERFILE
 
 # Set environment variables
 export JUPYTER_UID=$(id -u)
