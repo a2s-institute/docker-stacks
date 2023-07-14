@@ -1,5 +1,6 @@
 jupyterhub
 jupyterlab
+nbzip
 keras
 ipywidgets
 nbresuse
@@ -26,9 +27,9 @@ pydot
 pyyaml
 pypdf2
 pdfkit
-scipy==1.8.1
+scipy
 tensorflow
-open3d==0.16.0
 ftfy
 timm
 transformers
+#open3d
