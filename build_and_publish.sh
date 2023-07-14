@@ -69,7 +69,7 @@ then
   echo "Cuda version is not set, setting it to default 11.3.1-cudnn8-runtime-ubuntu20.04"
   CUDA_VERSION=11.8.0-cudnn8-runtime-ubuntu22.04
   # set pytorch cuda accordingly
-  PYTORCH_CUDA=11.8
+  PYTORCH_CUDA=cu118
 fi
 echo "Cuda image version: $CUDA_VERSION"
 
