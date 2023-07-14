@@ -89,7 +89,7 @@ echo "Deployment: $DEPLOYMENT"
 
 function build_and_publish_gpu_notebook {
   cd gpu-base-notebook
-  GPU_BASE_NOTEBOOK_TAG=$CONTAINER_REG_OWNER/gpu-base-notebook:$CUDA_VERSION
+  GPU_BASE_NOTEBOOK_TAG=$CONTAINER_REG_OWNER/gpu-notebook-base:$CUDA_VERSION
   GPU_NOTEBOOK_TAG=$CONTAINER_REG_OWNER/gpu-notebook:$CUDA_VERSION
 
   # prepare docker file gpu-base-notebook

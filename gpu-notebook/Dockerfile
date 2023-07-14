@@ -1,4 +1,4 @@
-ARG BASE_CONTAINER=ghcr.io/a2s-institute/docker-stacks/gpu-base-notebook:11.8.0-cudnn8-runtime-ubuntu22.04
+ARG BASE_CONTAINER=ghcr.io/a2s-institute/docker-stacks/gpu-notebook-base:11.8.0-cudnn8-runtime-ubuntu22.04
 
 FROM $BASE_CONTAINER
 
