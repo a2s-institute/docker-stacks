@@ -76,9 +76,6 @@ function build_and_publish_single_image {
   IMAGE_TAG=$2
   PORT=$3
 
-  # prepare docker file gpu-base-notebook
-  #bash generate_dockerfile.sh
-
   docker build -t $IMAGE_TAG $IMAGE_DIR
 
   if docker run -it --rm -d -p $PORT:$PORT $IMAGE_TAG;
@@ -100,7 +97,7 @@ function build_and_publish_single_image {
 function build_and_publish {
   # Generate base dockerfile and images
   cd base-gpu-notebook
-  generate_dockerfile.sh
+  bash generate_dockerfile.sh
   
   BASE_PORT=7000
   for dir in */; do
