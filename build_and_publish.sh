@@ -11,7 +11,6 @@ then
   echo " "
   echo "options:"
   echo "-h, --help                    show brief help"
-  echo "-c, --cuda                    cuda image tag e.g. 11.8.0-cudnn8-runtime-ubuntu22.04, default: 11.8.0-cudnn8-runtime-ubuntu22.04"
   echo "-d, --deployment              deployment (dev or prod), default: is empty or not published to registry"
   echo "-r, --registry                container registry e.g. ghcr.io for GitHub container registry, default: docker hub"
   echo "-p, --publish                 option whether to publish <all> or <latest> (default: all), all means publish all tags"
@@ -26,17 +25,11 @@ while test $# -gt 0; do
       echo " "
       echo "options:"
       echo "-h, --help                show brief help"
-      echo "-c, --cuda                cuda image tag e.g. 11.8.0-cudnn8-runtime-ubuntu22.04, default: 11.8.0-cudnn8-runtime-ubuntu22.04"
       echo "-d, --deployment          deployment (dev or prod), default: is empty or not published to registry"
       echo "-r, --registry            container registry e.g. ghcr.io for GitHub container registry, default: docker hub"
       echo "-p, --publish             option whether to publish <all> tags or <latest> tags only (default: all)"
       echo "-i, --image               image to build domestic|gpu-notebook|all (default: all)"
       exit 0
-      ;;
-    -c|--cuda)
-      CUDA_VERSION="$2"
-      shift
-      shift
       ;;
     -d|--deployment)
       DEPLOYMENT="$2"
@@ -64,15 +57,6 @@ while test $# -gt 0; do
   esac
 done
 
-if [ -z "$CUDA_VERSION" ]
-then
-  echo "Cuda version is not set, setting it to default 11.3.1-cudnn8-runtime-ubuntu20.04"
-  CUDA_VERSION=11.8.0-cudnn8-runtime-ubuntu22.04
-  # set pytorch cuda accordingly
-  PYTORCH_CUDA=cu118
-fi
-echo "Cuda image version: $CUDA_VERSION"
-
 echo "Image version: $VERSION"
 if [ -z "$CONTAINER_REGISTRY" ]
 then
@@ -87,50 +71,69 @@ fi
 echo "Container registry/owner = $CONTAINER_REG_OWNER"
 echo "Deployment: $DEPLOYMENT"
 
-function build_and_publish_gpu_notebook {
-  cd gpu-notebook-base
-  GPU_BASE_NOTEBOOK_TAG=$CONTAINER_REG_OWNER/gpu-notebook-base:$CUDA_VERSION
-  GPU_NOTEBOOK_TAG=$CONTAINER_REG_OWNER/gpu-notebook:$CUDA_VERSION
+function build_and_publish_single_image {
+  IMAGE_DIR=$1
+  IMAGE_TAG=$2
+  PORT=$3
 
-  # prepare docker file gpu-notebook-base
-  bash generate_dockerfile.sh
+  # prepare docker file gpu-base-notebook
+  #bash generate_dockerfile.sh
 
-  docker build -t $GPU_BASE_NOTEBOOK_TAG --build-arg BASE_CONTAINER=nvidia/cuda:$CUDA_VERSION .build/
-  docker build -t $GPU_NOTEBOOK_TAG --build-arg BASE_CONTAINER=$GPU_BASE_NOTEBOOK_TAG --build-arg PYTORCH_CUDA=$PYTORCH_CUDA ../gpu-notebook/
+  docker build -t $IMAGE_TAG $IMAGE_DIR
 
-  if docker run -it --rm -d -p 8880:8888 $GPU_BASE_NOTEBOOK_TAG;
+  if docker run -it --rm -d -p $PORT:$PORT $IMAGE_TAG;
   then
-    echo "$GPU_BASE_NOTEBOOK_TAG is running";
+    echo "$IMAGE_TAG is running";
   else
-    echo "Failed to run $GPU_BASE_NOTEBOOK_TAG" && exit 1;
-  fi
-
-  if docker run -it --rm -d -p 8881:8888 $GPU_NOTEBOOK_TAG;
-  then
-    echo "$GPU_NOTEBOOK_TAG is running";
-  else
-    echo "Failed to run $GPU_NOTEBOOK_TAG" && exit 1;
+    echo "Failed to run $IMAGE_TAG" && exit 1;
   fi
 
   if [ "$PUBLISH" = "all" ]
   then
-    echo "Pushing $GPU_BASE_NOTEBOOK_TAG"
-    docker push $GPU_BASE_NOTEBOOK_TAG
-
-    echo "Pushing $GPU_NOTEBOOK_TAG"
-    docker push $GPU_NOTEBOOK_TAG
+    echo "Pushing $IMAGE_TAG"
+    docker push $IMAGE_TAG
   else
     echo "None is published"
   fi
+}
+
+function build_and_publish {
+  # Generate base dockerfile and images
+  cd base-gpu-notebook
+  generate_dockerfile.sh
+  
+  BASE_PORT=7000
+  for dir in */; do
+    # please test the build of the commit in https://github.com/jupyter/docker-stacks/commits/main in advance
+    CUDA_VERSION_DIR=${dir%*/}
+    IMAGE_DIR=.build/$CUDA_VERSION_DIR
+
+    IMAGE_TAG=$CONTAINER_REG_OWNER/base-gpu-notebook:$CUDA_VERSION_DIR
+    echo "Building image $IMAGE_TAG"
+    build_and_publish_single_image $IMAGE_DIR $IMAGE_TAG $BASE_PORT
+
+    let "BASE_PORT+=1"
+  done  
+  cd ..
+  
+  cd gpu-notebook
+  NB_PORT=8000
+  GPU_NOTEBOOK_DIR=gpu-notebook
+  for dir in */; do
+    echo "Dir $dir"
+    # please test the build of the commit in https://github.com/jupyter/docker-stacks/commits/main in advance
+    CUDA_VERSION_DIR=${dir%*/}
+    IMAGE_DIR=$CUDA_VERSION_DIR
+
+    IMAGE_TAG=$CONTAINER_REG_OWNER/gpu-notebook:$IMAGE_DIR
+    echo "Building image $IMAGE_TAG"
+    build_and_publish_single_image $IMAGE_DIR $IMAGE_TAG $NB_PORT
+
+    let "NB_PORT+=1"
+  done  
   cd ..
 }
 
 # build and push docker image
-echo "Building and publishing $IMAGE"
-if [ "$IMAGE" = "gpu-notebook" ]
-then
-  build_and_publish_gpu_notebook
-else
-  # build all images here
-  build_and_publish_gpu_notebook
-fi
+echo "Building and publishing images"
+build_and_publish
