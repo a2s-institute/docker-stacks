@@ -1,4 +1,3 @@
-jupyterhub
 jupyterlab
 nbzip
 keras
