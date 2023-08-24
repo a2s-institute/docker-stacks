@@ -26,7 +26,7 @@ RUN conda install gh --channel conda-forge && \
 
 COPY requirements.txt /tmp/requirements.txt
 RUN pip install --upgrade pip && \
-    pip install --no-cache-dir torch==2.0.1+cu118 torchvision==0.15.2+cu118 torchaudio --index-url https://download.pytorch.org/whl/cu118 && \
+    pip install --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118 && \
     pip install --no-cache-dir -r /tmp/requirements.txt
     # does not work with jupyter_server
     #jupyter serverextension enable  --sys-prefix --py nbzip && \
