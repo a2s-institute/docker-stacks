@@ -12,8 +12,9 @@ USER root
 RUN curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
 RUN echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" | tee /etc/apt/sources.list.d/coral-edgetpu.list
 
-RUN apt-get update && \
-    apt-get install -y edgetpu-compiler && \
+RUN apt update -y && \
+    apt install -y edgetpu-compiler && \
+    apt install -y libxkbcommon0 libxkbcommon-x11-0 &&
     rm -rf /var/lib/apt/lists/*
 
 USER $NB_USER
