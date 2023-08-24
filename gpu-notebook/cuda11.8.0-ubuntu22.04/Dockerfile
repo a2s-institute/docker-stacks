@@ -14,7 +14,7 @@ RUN echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" |
 
 RUN apt update -y && \
     apt install -y edgetpu-compiler && \
-    apt install -y libxkbcommon0 libxkbcommon-x11-0 &&
+    apt install -y libxkbcommon0 libxkbcommon-x11-0 && \
     rm -rf /var/lib/apt/lists/*
 
 USER $NB_USER
