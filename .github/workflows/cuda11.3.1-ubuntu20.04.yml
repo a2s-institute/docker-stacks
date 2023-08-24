@@ -1,5 +1,5 @@
 ---
-name: CI 
+name: cuda11.3.1-ubuntu20.04
 on:
   pull_request:
   push:
@@ -54,7 +54,7 @@ jobs:
       run: |
         OWNER=${{ needs.setup.outputs.owner }}
 
-        bash build_and_publish.sh --registry ghcr.io --publish "" --image gpu-notebook
+        bash build_and_publish.sh --registry ghcr.io --publish "" --cuda-version "cuda11.3.1-ubuntu20.04"
 
     - name: Docker image list
       run: docker images
@@ -84,7 +84,7 @@ jobs:
       run: |
         OWNER=${{ needs.setup.outputs.owner }}
 
-        bash build_and_publish.sh --registry ghcr.io --publish "all" --image gpu-notebook
+        bash build_and_publish.sh --registry ghcr.io --publish "all" --cuda-version "cuda11.3.1-ubuntu20.04"
 
     - name: Docker image list
       run: docker images
