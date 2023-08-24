@@ -54,7 +54,7 @@ jobs:
       run: |
         OWNER=${{ needs.setup.outputs.owner }}
         CUDA_VERSION=${{ github.event.inputs.cuda }}
-        build_and_publish.sh --registry ghcr.io --publish "all" --cuda-version $CUDA_VERSION
+        bash build_and_publish.sh --registry ghcr.io --publish "all" --cuda-version $CUDA_VERSION
 
     - name: Docker image list
       run: docker images
