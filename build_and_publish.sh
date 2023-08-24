@@ -4,9 +4,9 @@
 DEPLOYMENT=""
 CONTAINER_REGISTRY=""
 PUBLISH="all"
+CUDA_VERSION="all"
 
-if [ $# -eq 0 ]
-then
+show_help() {
   echo "Usage: bash build-and-deploy.sh"
   echo " "
   echo "options:"
@@ -14,50 +14,52 @@ then
   echo "-d, --deployment              deployment (dev or prod), default: is empty or not published to registry"
   echo "-r, --registry                container registry e.g. ghcr.io for GitHub container registry, default: docker hub"
   echo "-p, --publish                 option whether to publish <all> or <latest> (default: all), all means publish all tags"
-  echo "-i, --image                   image to build base|domestic|gpu-notebook|all (default: all)"
-  exit 0
+  echo "-c, --cuda-version            cuda version to build cuda11.3.1-ubuntu20.04|cuda11.8.0-ubuntu20.04|all (default: all)"
+}
+
+parse_args() {
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -h|--help)
+        show_help
+        exit 0
+        ;;
+      -d|--deployment)
+        DEPLOYMENT="$2"
+        shift 2
+        ;;
+      -r|--registry)
+        CONTAINER_REGISTRY="$2"
+        shift 2
+        ;;
+      -p|--publish)
+        PUBLISH="$2"
+        shift 2
+        ;;
+      -c|--cuda-version)
+        CUDA_VERSION="$2"
+        CUDA_VERSION_PROVIDED=true
+        shift 2
+        ;;
+      *)
+        echo "Invalid argument: $1"
+        show_help
+        exit 1
+        ;;
+    esac
+  done
+}
+
+if [ -z "$CONTAINER_REGISTRY" ]
+then
+  echo "Container registry is not set!. Using docker hub registry"
+  CONTAINER_REG_OWNER=bitbots
+else
+  echo "Using $CONTAINER_REGISTRY registry"
+  OWNER=a2s-institute/docker-stacks
+  CONTAINER_REG_OWNER=$CONTAINER_REGISTRY/$OWNER
 fi
 
-while test $# -gt 0; do
-  case "$1" in
-    -h|--help)
-      echo "Usage: bash build-and-deploy.sh"
-      echo " "
-      echo "options:"
-      echo "-h, --help                show brief help"
-      echo "-d, --deployment          deployment (dev or prod), default: is empty or not published to registry"
-      echo "-r, --registry            container registry e.g. ghcr.io for GitHub container registry, default: docker hub"
-      echo "-p, --publish             option whether to publish <all> tags or <latest> tags only (default: all)"
-      echo "-i, --image               image to build domestic|gpu-notebook|all (default: all)"
-      exit 0
-      ;;
-    -d|--deployment)
-      DEPLOYMENT="$2"
-      shift
-      shift
-      ;;
-    -r|--registry)
-      CONTAINER_REGISTRY="$2"
-      shift
-      shift
-      ;;
-    -p|--publish)
-      PUBLISH="$2"
-      shift
-      shift
-      ;;
-    -i|--image)
-      IMAGE="$2"
-      shift
-      shift
-      ;;
-    *)
-      break
-      ;;
-  esac
-done
-
-echo "Image version: $VERSION"
 if [ -z "$CONTAINER_REGISTRY" ]
 then
   echo "Container registry is not set!. Using docker hub registry"
@@ -94,7 +96,7 @@ function build_and_publish_single_image {
   fi
 }
 
-function build_and_publish {
+function build_and_publish_all {
   # Generate base dockerfile and images
   cd base-gpu-notebook
   bash generate_dockerfile.sh
@@ -131,6 +133,44 @@ function build_and_publish {
   cd ..
 }
 
+function build_and_publish_single_cuda_version {
+  # Generate base dockerfile and images
+  cd base-gpu-notebook
+  bash generate_dockerfile.sh
+  
+  BASE_PORT=7070
+  CUDA_VERSION_DIR=$1
+  IMAGE_DIR=.build/$CUDA_VERSION_DIR
+
+  IMAGE_TAG=$CONTAINER_REG_OWNER/base-gpu-notebook:$CUDA_VERSION_DIR
+  echo "Building base image $IMAGE_TAG"
+  build_and_publish_single_image $IMAGE_DIR $IMAGE_TAG $BASE_PORT
+  cd ..
+  
+  cd gpu-notebook
+  NB_PORT=8080
+  CUDA_VERSION_DIR=$1
+  IMAGE_DIR=$CUDA_VERSION_DIR
+
+  IMAGE_TAG=$CONTAINER_REG_OWNER/gpu-notebook:$IMAGE_DIR
+  echo "Building image $IMAGE_TAG"
+  build_and_publish_single_image $IMAGE_DIR $IMAGE_TAG $NB_PORT
+
+  cd ..
+}
+
+function build_and_publish {
+  if [ "$CUDA_VERSION" = "all" ]
+  then
+    echo "No cuda version specified, building all cuda versions"
+    build_and_publish_all
+  else
+    echo "Build and ublish single cuda version $CUDA_VERSION"
+    build_and_publish_single_cuda_version $CUDA_VERSION
+  fi
+}
+
 # build and push docker image
+parse_args "$@"
 echo "Building and publishing images"
 build_and_publish
