@@ -68,7 +68,10 @@ function build_and_publish_single_image {
   IMAGE_TAG=$2
   PORT=$3
 
-  docker build -t $IMAGE_TAG $IMAGE_DIR
+  if ! docker build -t $IMAGE_TAG $IMAGE_DIR; then
+    echo "Docker build failed $IMAGE_TAG"
+    exit 1
+  fi
 
   if docker run -it --rm -d -p $PORT:$PORT $IMAGE_TAG;
   then
