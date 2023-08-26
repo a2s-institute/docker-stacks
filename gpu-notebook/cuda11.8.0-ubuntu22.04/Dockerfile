@@ -20,13 +20,13 @@ RUN apt update -y && \
 USER $NB_USER
 
 # Github cli and graphviz
-RUN conda install gh --channel conda-forge && \
-    conda install python=3.11 && \
-    conda install graphviz
+RUN conda install -y gh --channel conda-forge && \
+    conda install -y python=3.11 && \
+    conda install -y graphviz && \
+    conda install -y pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia
 
 COPY requirements.txt /tmp/requirements.txt
 RUN pip install --upgrade pip && \
-    pip install --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118 && \
     pip install --no-cache-dir -r /tmp/requirements.txt
     # does not work with jupyter_server
     #jupyter serverextension enable  --sys-prefix --py nbzip && \
