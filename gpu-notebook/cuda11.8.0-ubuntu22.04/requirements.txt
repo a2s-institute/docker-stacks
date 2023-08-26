@@ -31,4 +31,6 @@ tensorflow
 ftfy
 timm
 transformers
+cmake
+lit
 #open3d
