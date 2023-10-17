@@ -34,3 +34,4 @@ transformers
 cmake
 lit
 #open3d
+#llama-cpp-python
