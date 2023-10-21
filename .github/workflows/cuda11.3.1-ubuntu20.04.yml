@@ -12,8 +12,31 @@ on:
     - cron: "0 1 * * 0"
 
 jobs:
+  setup:
+    name: Setup 
+    runs-on: ubuntu-latest
+
+    outputs:
+      owner: ${{ steps.setup_image.outputs.owner }}
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup image
+      id: setup_image
+      run: |
+        if [ "$GITHUB_EVENT_NAME" = "pull_request" ]
+        then
+          GH_BRANCH=$GITHUB_BASE_REF
+        else
+          GH_BRANCH=${GITHUB_REF##*/}
+        fi
+
+        echo "::set-output name=owner::ghcr.io/b-it-bots/docker"
+
   build-base-gpu-notebook:
     name: Build gpu-notebook image
+    needs: setup
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
 
@@ -63,6 +86,7 @@ jobs:
 
   publish-base-gpu-notebook:
     name: Build and publish base-gpu-notebook
+    needs: setup
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
 
