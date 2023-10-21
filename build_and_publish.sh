@@ -1,19 +1,19 @@
 # Build and publish images
 # Copyright a2s-institute, Hochschule Bonn-Rhein-Sieg
 
-DEPLOYMENT=""
 CONTAINER_REGISTRY=""
 PUBLISH="all"
-CUDA_VERSION="all"
+IMAGE="base-gpu-notebook"
+CUDA_VERSION="cuda11.8.0-ubuntu20.04"
 
 show_help() {
   echo "Usage: bash build-and-deploy.sh"
   echo " "
   echo "options:"
   echo "-h, --help                    show brief help"
-  echo "-d, --deployment              deployment (dev or prod), default: is empty or not published to registry"
   echo "-r, --registry                container registry e.g. ghcr.io for GitHub container registry, default: docker hub"
   echo "-p, --publish                 option whether to publish <all> or <latest> (default: all), all means publish all tags"
+  echo "-i, --image                   image to build or publish"
   echo "-c, --cuda-version            cuda version to build cuda11.3.1-ubuntu20.04|cuda11.8.0-ubuntu20.04|all (default: all)"
 }
 
@@ -24,16 +24,16 @@ parse_args() {
         show_help
         exit 0
         ;;
-      -d|--deployment)
-        DEPLOYMENT="$2"
-        shift 2
-        ;;
       -r|--registry)
         CONTAINER_REGISTRY="$2"
         shift 2
         ;;
       -p|--publish)
         PUBLISH="$2"
+        shift 2
+        ;;
+      -i|--image)
+        IMAGE="$2"
         shift 2
         ;;
       -c|--cuda-version)
@@ -61,7 +61,6 @@ else
 fi
 
 echo "Container registry/owner = $CONTAINER_REG_OWNER"
-echo "Deployment: $DEPLOYMENT"
 
 function build_and_publish_single_image {
   IMAGE_DIR=$1
@@ -89,81 +88,49 @@ function build_and_publish_single_image {
   fi
 }
 
-function build_and_publish_all {
+function build_base_image {
   # Generate base dockerfile and images
-  cd base-gpu-notebook
-  bash generate_dockerfile.sh
-  
-  BASE_PORT=7000
-  for dir in */; do
-    # please test the build of the commit in https://github.com/jupyter/docker-stacks/commits/main in advance
-    CUDA_VERSION_DIR=${dir%*/}
-    IMAGE_DIR=.build/$CUDA_VERSION_DIR
-
-    IMAGE_TAG=$CONTAINER_REG_OWNER/base-gpu-notebook:$CUDA_VERSION_DIR
-    echo "Building image $IMAGE_TAG"
-    build_and_publish_single_image $IMAGE_DIR $IMAGE_TAG $BASE_PORT
-
-    let "BASE_PORT+=1"
-  done  
-  cd ..
-  
-  cd gpu-notebook
-  NB_PORT=8000
-  GPU_NOTEBOOK_DIR=gpu-notebook
-  for dir in */; do
-    echo "Dir $dir"
-    # please test the build of the commit in https://github.com/jupyter/docker-stacks/commits/main in advance
-    CUDA_VERSION_DIR=${dir%*/}
-    IMAGE_DIR=$CUDA_VERSION_DIR
-
-    IMAGE_TAG=$CONTAINER_REG_OWNER/gpu-notebook:$IMAGE_DIR
-    echo "Building image $IMAGE_TAG"
-    build_and_publish_single_image $IMAGE_DIR $IMAGE_TAG $NB_PORT
-
-    let "NB_PORT+=1"
-  done  
-  cd ..
-}
-
-function build_and_publish_single_cuda_version {
-  # Generate base dockerfile and images
-  cd base-gpu-notebook
+  cd $IMAGE
   bash generate_dockerfile.sh
   
   BASE_PORT=7070
   CUDA_VERSION_DIR=$1
   IMAGE_DIR=.build/$CUDA_VERSION_DIR
 
-  IMAGE_TAG=$CONTAINER_REG_OWNER/base-gpu-notebook:$CUDA_VERSION_DIR
+  IMAGE_TAG=$CONTAINER_REG_OWNER/$IMAGE:$CUDA_VERSION_DIR
   echo "Building base image $IMAGE_TAG"
   build_and_publish_single_image $IMAGE_DIR $IMAGE_TAG $BASE_PORT
   cd ..
-  
-  cd gpu-notebook
+}
+
+function build_image {
+  cd $IMAGE
   NB_PORT=8080
   CUDA_VERSION_DIR=$1
   IMAGE_DIR=$CUDA_VERSION_DIR
 
-  IMAGE_TAG=$CONTAINER_REG_OWNER/gpu-notebook:$IMAGE_DIR
+  IMAGE_TAG=$CONTAINER_REG_OWNER/$IMAGE:$IMAGE_DIR
   echo "Building image $IMAGE_TAG"
   build_and_publish_single_image $IMAGE_DIR $IMAGE_TAG $NB_PORT
 
   cd ..
 }
 
-function build_and_publish {
-  if [ "$CUDA_VERSION" = "all" ]
+function main {
+  if [ "$IMAGE" = "base-gpu-notebook" ]
   then
-    echo "No cuda version specified, building all cuda versions"
-    build_and_publish_all
+    echo "Building $IMAGE $CUDA_VERSION"
+    build_base_image $CUDA_VERSION
+  elif [ "$IMAGE" = "gpu-notebook" ]
+  then
+    echo "Building $IMAGE $CUDA_VERSION"
+    build_image $CUDA_VERSION
   else
-    echo "Build and ublish single cuda version $CUDA_VERSION"
-    build_and_publish_single_cuda_version $CUDA_VERSION
+    echo "Unrecognized $IMAGE and $CUDA_VERSION"
   fi
 }
 
 # build and push docker image
 parse_args "$@"
 echo "Building and publishing images"
-build_and_publish
+main
