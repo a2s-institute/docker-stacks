@@ -14,7 +14,7 @@ on:
 
 jobs:
   build-base-gpu-notebook:
-    name: Build gpu-notebook image
+    name: Build base gpu-notebook image
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
 
