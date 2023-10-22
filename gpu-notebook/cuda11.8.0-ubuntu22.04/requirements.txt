@@ -33,5 +33,5 @@ timm
 transformers
 cmake
 lit
+llama-cpp-python
 #open3d
-#llama-cpp-python
