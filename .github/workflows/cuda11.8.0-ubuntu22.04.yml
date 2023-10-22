@@ -6,6 +6,7 @@ on:
     branches:
       - master
     paths:
+      - .github/workflows/cuda11.8.0-ubuntu22.04.yml
       - base-gpu-notebook/**
       - gpu-notebook/cuda11.8.0-ubuntu22.04/**
   schedule:
