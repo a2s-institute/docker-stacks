@@ -64,7 +64,6 @@ jobs:
 
   publish-base-gpu-notebook:
     name: Build and publish base-gpu-notebook
-    needs: setup
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
 
