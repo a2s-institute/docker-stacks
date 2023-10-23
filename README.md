@@ -1,5 +1,6 @@
 [<!--lint ignore no-dead-urls-->![Release cuda11.3.1-ubuntu20.04](https://github.com/a2s-institute/docker-stacks/actions/workflows/cuda11.3.1-ubuntu20.04.yml/badge.svg)](https://github.com/a2s-institute/docker-stacks/actions?workflow=cuda11.3.1-ubuntu20.04)
 [<!--lint ignore no-dead-urls-->![Release cuda11.8.0-ubuntu22.04](https://github.com/a2s-institute/docker-stacks/actions/workflows/cuda11.8.0-ubuntu22.04.yml/badge.svg)](https://github.com/a2s-institute/docker-stacks/actions?workflow=cuda11.8.0-ubuntu22.04)
+[![Docker Repository on Quay](https://quay.io/repository/a2s-institute/docker-stacks/gpu-notebook/status "Docker Repository on Quay")](https://quay.io/repository/a2s-institute/docker-stacks/gpu-notebook)
 
 # a2s-institute docker images
 
