@@ -23,7 +23,7 @@ USER $NB_USER
 # Github cli and graphviz
 RUN conda install -y gh --channel conda-forge && \
     conda install -y python=3.11 && \
-    conda install -y graphviz && \
+    conda install -y graphviz nb_conda_kernels && \
     conda install -y pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia
 
 COPY requirements.txt /tmp/requirements.txt

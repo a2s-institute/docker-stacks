@@ -21,7 +21,7 @@ USER $NB_USER
 # Github cli and graphviz
 RUN conda install gh --channel conda-forge && \
     conda install python=3.10 && \
-    conda install graphviz
+    conda install graphviz nb_conda_kernels
 
 COPY requirements.txt /tmp/requirements.txt
 RUN pip install --upgrade pip && \
