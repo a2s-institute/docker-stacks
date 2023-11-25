@@ -7,7 +7,7 @@ USER root
 RUN apt-get update && \
     apt-get install -y libgl1-mesa-dev vim htop curl software-properties-common && \
     apt-get install -y cmake libncurses5-dev libncursesw5-dev git sox && \
-    add-apt-repository ppa:flexiondotorg/nvtop && \
+    add-apt-repository -y ppa:flexiondotorg/nvtop && \
     apt-get install -y nvtop zip && \
     rm -rf /var/lib/apt/lists/*
 
