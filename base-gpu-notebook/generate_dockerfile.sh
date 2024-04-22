@@ -60,6 +60,9 @@ function generate_dockerfile {
   ############################################################################
   " >> $DOCKERFILE
 
+  # Copy xfce desktop configuration
+  cp user-dirs.defaults $BUILD_DIR
+
   # remove default root container
   DOCKER_STACKS_FOUNDATION=$STACKS_DIR/images/docker-stacks-foundation
   #grep -v "ARG ROOT_CONTAINER" $DOCKER_STACKS_FOUNDATION/Dockerfile >> $DOCKERFILE

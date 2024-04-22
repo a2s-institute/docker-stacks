@@ -1,19 +1,60 @@
 
 LABEL maintainer="A2S Institute <e2x@inf.h-brs.de>"
 
-# Install mesa to fix opencv libGl
 USER root
 
-RUN apt-get update && \
-    apt-get install -y libgl1-mesa-dev vim htop curl software-properties-common && \
-    apt-get install -y cmake libncurses5-dev libncursesw5-dev git sox && \
-    add-apt-repository ppa:flexiondotorg/nvtop && \
-    apt-get install -y nvtop zip && \
-    rm -rf /var/lib/apt/lists/*
+# Install base packes, xfce desktop and TurboVNC
+ENV PATH=/opt/TurboVNC/bin:$PATH
+ARG CODE_VERSION=4.23.1
+ENV CODE_VERSION=$CODE_VERSION
 
-RUN /opt/conda/bin/conda clean -afy \
-    && find /opt/conda/ -follow -type f -name '*.a' -delete \
-    && find /opt/conda/ -follow -type f -name '*.pyc' -delete \
-    && find /opt/conda/ -follow -type f -name '*.js.map' -delete
+RUN apt update -y -qq \
+    && apt install -y apt-utils libgl1-mesa-dev vim htop curl software-properties-common \
+    && apt install -y cmake libncurses5-dev libncursesw5-dev git sox zip \
+    && add-apt-repository ppa:flexiondotorg/nvtop \
+    && apt install -y nvtop \
+    && apt-get -y -qq install \
+        dbus-x11 \
+        xfce4 \
+        xfce4-panel \
+        xfce4-session \
+        xfce4-settings \
+        xfce4-terminal \
+        xorg \
+        xubuntu-icon-theme \
+        fonts-dejavu \
+        libgtk2.0-0 \
+    # Disable the automatic screenlock since the account password is unknown
+    && apt -y -qq remove xfce4-screensaver \
+    # Disable warning: Failed to execute default Terminal Emulator
+    && update-alternatives --config x-terminal-emulator \
+    # chown $HOME to workaround that the xorg installation creates a
+    # /home/$NB_USER/.cache directory owned by root
+    && chown -R "$NB_UID":"$NB_GID" "$HOME" \
+    && wget -q -O- https://packagecloud.io/dcommander/turbovnc/gpgkey | gpg --dearmor >/etc/apt/trusted.gpg.d/TurboVNC.gpg \
+    && wget -O /etc/apt/sources.list.d/TurboVNC.list https://raw.githubusercontent.com/TurboVNC/repo/main/TurboVNC.list \
+    && apt update -y \
+    && apt -y -qq install turbovnc \
+    # install vs code
+    && curl -fOL https://github.com/coder/code-server/releases/download/v$CODE_VERSION/code-server_${CODE_VERSION}_amd64.deb \
+    && dpkg -i code-server_${CODE_VERSION}_amd64.deb \
+    # clean up
+    && rm -f code-server_${CODE_VERSION}_amd64.deb \
+    && apt clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && find /usr/lib/code-server -type f -name '*.js.map' -delete \
+    && npm cache clean --force
+
+COPY --chown=$NB_UID:$NB_GID user-dirs.defaults /etc/xdg/
+RUN mkdir -p /usr/local/xfce-userdirs/ && \
+    chown -R "$NB_UID":"$NB_GID" /usr/local/xfce-userdirs/
+
+RUN mamba install -y "jupyter-server-proxy>=1.4" websockify -c conda-forge && \
+    mamba install -y jupyter-vscode-proxy -c conda-forge && \
+    pip install --no-cache-dir jupyter_remote_desktop_proxy && \
+    mamba clean -afy && \
+    npm cache clean --force && \
+    find /opt/conda/ -follow -type f -name '*.js.map' -delete
 
 USER $NB_USER
+RUN xdg-user-dirs-update
