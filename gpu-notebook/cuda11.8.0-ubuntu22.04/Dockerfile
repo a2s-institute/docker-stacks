@@ -18,6 +18,9 @@ RUN apt update -y && \
     apt install -y build-essential && \
     rm -rf /var/lib/apt/lists/*
 
+# allow nbuser to notebook dir
+RUN chown -R "$NB_UID":"$NB_GID" /opt/conda/etc/jupyter/nbconfig/notebook.d
+ 
 USER $NB_USER
 
 # Github cli and graphviz
