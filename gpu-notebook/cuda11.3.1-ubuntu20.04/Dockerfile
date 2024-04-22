@@ -18,10 +18,10 @@ RUN apt-get update && \
 
 USER $NB_USER
 
-# Github cli and graphviz
+# Reinstall python to match torch requirement
 RUN conda install gh --channel conda-forge && \
     conda install graphviz nb_conda_kernels && \
-    conda install pytorch==1.12.1 torchvision==0.13.1 torchaudio==0.12.1 -c pytorch
+    conda install python=3.10 pytorch==1.12.1 torchvision==0.13.1 torchaudio==0.12.1 -c pytorch
 
 COPY requirements.txt /tmp/requirements.txt
 RUN pip install --upgrade pip && \
