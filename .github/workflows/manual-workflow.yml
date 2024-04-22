@@ -2,8 +2,12 @@ name: Manual workflow
 on:
   workflow_dispatch:
     inputs:
-      cuda:
-        description: 'Cuda version to build'
+      image:
+        description: 'Image to build e.g. gpu-notebook'
+        required: true
+        default: 'gpu-notebook'
+      tag:
+        description: 'Tag to build e.g. cuda11.8.0-ubuntu22.04'
         required: true
         default: 'cuda11.8.0-ubuntu22.04'
 
@@ -53,8 +57,9 @@ jobs:
       id: build_and_deploy_image
       run: |
         OWNER=${{ needs.setup.outputs.owner }}
-        CUDA_VERSION=${{ github.event.inputs.cuda }}
-        bash build_and_publish.sh --registry ghcr.io --publish "all" --cuda-version $CUDA_VERSION
+        IMAGE=${{ github.event.inputs.image }}
+        TAG=${{ github.event.inputs.tag }}
+        bash build_and_publish.sh --registry ghcr.io --publish "all" --cuda-version $TAG --image $IMAGE
 
     - name: Docker image list
       run: docker images
