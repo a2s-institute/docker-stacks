@@ -124,6 +124,7 @@ jobs:
           retention-days: 3
 
   images-tag-push:
+    needs: [build-test-upload] 
     uses: ./.github/workflows/docker-tag-push.yml
     if: inputs.push == true
     with:
