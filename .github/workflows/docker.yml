@@ -54,19 +54,9 @@ jobs:
       parent-variant: cuda11-pytorch-2.2.2
       image: base-gpu-notebook
       variant: cuda11-pytorch-2.2.2
+      push: ${{ github.event_name == 'push' }}
       runs-on: ubuntu-latest
   
-  push-base-gpu-notebook-cuda11:
-    needs: [base-gpu-notebook-cuda11]
-    if: ${{ github.event_name == 'push' }}
-    uses: ./.github/workflows/docker-tag-push.yml
-    with:
-      image: ${{ inputs.image }}
-      variant: ${{ inputs.variant }}
-    secrets:
-      REGISTRY_USERNAME: ${{ secrets.QUAY_USERNAME }}
-      REGISTRY_TOKEN: ${{ secrets.QUAY_ROBOT_TOKEN }}
-
   ml-notebook-cuda11:
     needs: [base-gpu-notebook-cuda11]
     uses: ./.github/workflows/docker-build-test-upload.yml
@@ -75,18 +65,8 @@ jobs:
       parent-variant: cuda11-pytorch-2.2.2
       image: ml-notebook
       variant: cuda11-pytorch-2.2.2
+      push: ${{ github.event_name == 'push' }}
       runs-on: ubuntu-latest
-
-  push-ml-notebook-cuda11:
-    needs: [ml-notebook-cuda11]
-    if: ${{ github.event_name == 'push' }}
-    uses: ./.github/workflows/docker-tag-push.yml
-    with:
-      image: ${{ inputs.image }}
-      variant: ${{ inputs.variant }}
-    secrets:
-      REGISTRY_USERNAME: ${{ secrets.QUAY_USERNAME }}
-      REGISTRY_TOKEN: ${{ secrets.QUAY_ROBOT_TOKEN }}
 
   nlp-notebook-cuda11:
     needs: [ml-notebook-cuda11]
@@ -96,18 +76,8 @@ jobs:
       parent-variant: cuda11-pytorch-2.2.2
       image: nlp-notebook
       variant: cuda11-pytorch-2.2.2
+      push: ${{ github.event_name == 'push' }}
       runs-on: ubuntu-latest
-
-  push-nlp-notebook-cuda11:
-    needs: [nlp-notebook-cuda11]
-    if: ${{ github.event_name == 'push' }}
-    uses: ./.github/workflows/docker-tag-push.yml
-    with:
-      image: ${{ inputs.image }}
-      variant: ${{ inputs.variant }}
-    secrets:
-      REGISTRY_USERNAME: ${{ secrets.QUAY_USERNAME }}
-      REGISTRY_TOKEN: ${{ secrets.QUAY_ROBOT_TOKEN }}
 
   # cuda12
   source-cuda12-pytorch_2_2_2:
@@ -116,6 +86,7 @@ jobs:
       parent-image: ""
       image: pytorch-notebook
       variant: cuda12-pytorch-2.2.2
+      push: ${{ github.event_name == 'push' }}
       runs-on: ubuntu-latest
   
   base-gpu-notebook-cuda12:
@@ -126,18 +97,8 @@ jobs:
       parent-variant: cuda12-pytorch-2.2.2
       image: base-gpu-notebook
       variant: cuda12-pytorch-2.2.2
+      push: ${{ github.event_name == 'push' }}
       runs-on: ubuntu-latest
-
-  push-base-gpu-notebook-cuda12:
-    needs: [base-gpu-notebook-cuda12]
-    if: ${{ github.event_name == 'push' }}
-    uses: ./.github/workflows/docker-tag-push.yml
-    with:
-      image: ${{ inputs.image }}
-      variant: ${{ inputs.variant }}
-    secrets:
-      REGISTRY_USERNAME: ${{ secrets.QUAY_USERNAME }}
-      REGISTRY_TOKEN: ${{ secrets.QUAY_ROBOT_TOKEN }}
 
   ml-notebook-cuda12:
     needs: [base-gpu-notebook-cuda12]
@@ -147,18 +108,8 @@ jobs:
       parent-variant: cuda12-pytorch-2.2.2
       image: ml-notebook
       variant: cuda12-pytorch-2.2.2
+      push: ${{ github.event_name == 'push' }}
       runs-on: ubuntu-latest
-
-  push-ml-notebook-cuda12:
-    needs: [ml-notebook-cuda12]
-    if: ${{ github.event_name == 'push' }}
-    uses: ./.github/workflows/docker-tag-push.yml
-    with:
-      image: ${{ inputs.image }}
-      variant: ${{ inputs.variant }}
-    secrets:
-      REGISTRY_USERNAME: ${{ secrets.QUAY_USERNAME }}
-      REGISTRY_TOKEN: ${{ secrets.QUAY_ROBOT_TOKEN }}
 
   nlp-notebook-cuda12:
     needs: [ml-notebook-cuda12]
@@ -168,15 +119,6 @@ jobs:
       parent-variant: cuda11-pytorch-2.2.2
       image: nlp-notebook
       variant: cuda12-pytorch-2.2.2
+      push: ${{ github.event_name == 'push' }}
       runs-on: ubuntu-latest
 
-  push-nlp-notebook-cuda12:
-    needs: [nlp-notebook-cuda12]
-    if: ${{ github.event_name == 'push' }}
-    uses: ./.github/workflows/docker-tag-push.yml
-    with:
-      image: ${{ inputs.image }}
-      variant: ${{ inputs.variant }}
-    secrets:
-      REGISTRY_USERNAME: ${{ secrets.QUAY_USERNAME }}
-      REGISTRY_TOKEN: ${{ secrets.QUAY_ROBOT_TOKEN }}
