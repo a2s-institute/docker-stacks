@@ -51,6 +51,8 @@ RUN mkdir -p /usr/local/xfce-userdirs/ && \
 
 RUN mamba install -y "jupyter-server-proxy>=1.4" websockify -c conda-forge && \
     mamba install -y jupyter-vscode-proxy -c conda-forge && \
+    mamba install -y gh --channel conda-forge && \
+    mamba install -y graphviz nb_conda_kernels && \
     pip install --no-cache-dir jupyter_remote_desktop_proxy && \
     mamba clean -afy && \
     npm cache clean --force && \

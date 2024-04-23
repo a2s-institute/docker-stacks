@@ -17,11 +17,7 @@ opencv-python
 opencv-contrib-python
 easydict
 Pillow
-spacy
-nltk
-gensim
 imageio
-wikipedia-api
 pydot
 pyyaml
 pypdf2
@@ -33,5 +29,3 @@ timm
 transformers
 cmake
 lit
-llama-cpp-python
-#open3d

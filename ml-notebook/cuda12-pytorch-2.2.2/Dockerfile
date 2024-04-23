@@ -1,10 +1,8 @@
-ARG BASE_IMAGE=ghcr.io/a2s-institute/docker-stacks/base-gpu-notebook:cuda11.8.0-ubuntu22.04
+ARG BASE_IMAGE=ghcr.io/a2s-institute/docker-stacks/base-gpu-notebook:cuda12-pytorch-2.2.2
 
 FROM $BASE_IMAGE
 
 LABEL maintainer="Mohammad Wasil <e2x@inf.h-brs.de>"
-
-ARG PYTORCH_CUDA_VERSION=cu118
 
 USER root
 
@@ -18,16 +16,12 @@ RUN apt update -y && \
     apt install -y build-essential && \
     rm -rf /var/lib/apt/lists/*
 
-# allow nbuser to notebook dir
-RUN chown -R "$NB_UID":"$NB_GID" /opt/conda/etc/jupyter/nbconfig/notebook.d
- 
-USER $NB_USER
+# Change ownership if the directory exists
+RUN if [ -d "/opt/conda/etc/jupyter/nbconfig/notebook.d" ]; then \
+        chown -R $NB_UID:$NB_GID /opt/conda/etc/jupyter/nbconfig/notebook.d; \
+    fi
 
-# Github cli and graphviz
-RUN conda install -y gh --channel conda-forge && \
-    conda install -y python=3.11 && \
-    conda install -y graphviz nb_conda_kernels && \
-    conda install -y pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia
+USER $NB_USER
 
 COPY requirements.txt /tmp/requirements.txt
 RUN pip install --upgrade pip && \

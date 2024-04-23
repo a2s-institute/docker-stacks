@@ -1,0 +1,5 @@
+spacy
+nltk
+gensim
+wikipedia-api
+llama-cpp-python

@@ -17,11 +17,7 @@ opencv-python
 opencv-contrib-python
 easydict
 Pillow
-spacy
-nltk
-gensim
 imageio
-wikipedia-api
 pydot
 pyyaml
 pypdf2
@@ -31,4 +27,5 @@ tensorflow
 ftfy
 timm
 transformers
-#open3d
+cmake
+lit
