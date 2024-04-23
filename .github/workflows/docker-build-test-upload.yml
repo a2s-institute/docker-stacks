@@ -61,7 +61,7 @@ jobs:
           docker system prune --all --force
           rm -rf /tmp/a2s/
         shell: bash
-
+      
       - name: Load parent image to Docker 📥
         if: inputs.parent-image != ''
         uses: ./.github/actions/load-image
@@ -69,9 +69,10 @@ jobs:
           image: ${{ inputs.parent-image }}
           variant: ${{ inputs.parent-variant }}
 
+      # Source/initial image is always based on jupyter/pytorch-notebook
       - name: Source image 📥
         if: inputs.parent-image == ''
-        run: docker pull ${{ inputs.image }}:${{ inputs.variant }}
+        run: docker pull quay.io/jupyter/${{ inputs.image }}:${{ inputs.variant }}
         shell: bash
 
       - name: Build base image 🛠
