@@ -7,10 +7,10 @@ LABEL maintainer="Mohammad Wasil <e2x@inf.h-brs.de>"
 USER root
 
 # Install apt packages
-RUN curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
-RUN echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" | tee /etc/apt/sources.list.d/coral-edgetpu.list
 
 RUN apt update -y && \
+    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
+    "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" | tee /etc/apt/sources.list.d/coral-edgetpu.list && \
     apt install -y edgetpu-compiler && \
     apt install -y libxkbcommon0 libxkbcommon-x11-0 && \
     apt install -y build-essential && \
