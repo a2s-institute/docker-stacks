@@ -1,0 +1,68 @@
+name: Download a Docker image and its tags from GitHub artifacts, apply them, and push the image to the Registry
+
+env:
+  REGISTRY: quay.io
+  OWNER: ${{ github.repository_owner }}
+  PUSH_TO_REGISTRY: ${{ (github.repository_owner == 'a2s-institue' ) && (github.ref == 'refs/heads/main' || github.event_name == 'schedule') }}
+
+on:
+  workflow_call:
+    inputs:
+      image:
+        description: Image name
+        required: true
+        type: string
+      variant:
+        description: Variant tag prefix
+        required: true
+        type: string
+    secrets:
+      REGISTRY_USERNAME:
+        required: true
+      REGISTRY_TOKEN:
+        required: true
+
+jobs:
+  tag-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Image with CUDA needs extra disk space
+      - name: Free disk space 🧹
+        if: contains(inputs.variant, 'cuda')
+        uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: false
+          docker-images: false
+          swap-storage: false
+
+      - name: Checkout Repo ⚡️
+        uses: actions/checkout@v4
+      - name: Load image to Docker 📥
+        uses: ./.github/actions/load-image
+        with:
+          image: ${{ inputs.image }}
+          variant: ${{ inputs.variant }}
+
+      - name: Login to Registry 🔐
+        if: env.PUSH_TO_REGISTRY == 'true'
+        uses: docker/login-action@e92390c5fb421da1463c202d546fed0ec5c39f20 # v3.1.0
+        with:
+          registry: quay.io
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_TOKEN }}
+
+      - name: Download tags file 📥
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.image }}-${{ inputs.variant }}-tags
+          path: /tmp/a2s/tags/
+
+      - name: Push Images to Registry 📤
+        if: env.PUSH_TO_REGISTRY == 'true'
+        run: docker push --all-tags ${{ env.REGISTRY }}/${{ env.OWNER }}/${{ inputs.image }}
+        shell: bash
