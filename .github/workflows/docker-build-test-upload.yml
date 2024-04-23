@@ -122,15 +122,3 @@ jobs:
           name: ${{ inputs.image }}--${{ inputs.variant }}
           path: /tmp/a2s/images/${{ inputs.image }}--${{ inputs.variant }}.tar.zst
           retention-days: 3
-
-  image-push:
-    needs: [build-test-upload] 
-    uses: ./.github/workflows/docker-tag-push.yml
-    if: inputs.push == true
-    with:
-      image: ${{ inputs.image }}
-      variant: ${{ inputs.variant }}
-    secrets:
-      REGISTRY_USERNAME: ${{ secrets.QUAY_USERNAME }}
-      REGISTRY_TOKEN: ${{ secrets.QUAY_ROBOT_TOKEN }}
-
