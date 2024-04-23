@@ -59,10 +59,10 @@ jobs:
       - name: Download tags file 📥
         uses: actions/download-artifact@v4
         with:
-          name: ${{ inputs.image }}-${{ inputs.variant }}-tags
+          name: ${{ inputs.image }}:${{ inputs.variant }}
           path: /tmp/a2s/tags/
 
       - name: Push Images to Registry 📤
         if: env.PUSH_TO_REGISTRY == 'true'
-        run: docker push --all-tags ${{ env.REGISTRY }}/${{ env.OWNER }}/${{ inputs.image }}
+        run: docker push ${{ env.REGISTRY }}/${{ env.OWNER }}/${{ inputs.image }}:${{ inputs.variant }}
         shell: bash

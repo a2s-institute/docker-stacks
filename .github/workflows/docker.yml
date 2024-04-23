@@ -36,6 +36,22 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  source-cuda11-pytorch-2.2.2:
+    uses: ./.github/workflows/docker-build-test-upload.yml
+    with:
+      parent-image: ""
+      image: jupyter/pytorch-notebook
+      variant: cuda11-pytorch-2.2.2
+      runs-on: ubuntu-latest
+
+  source-cuda12-pytorch-2.2.2:
+    uses: ./.github/workflows/docker-build-test-upload.yml
+    with:
+      parent-image: ""
+      image: jupyter/pytorch-notebook
+      variant: cuda12-pytorch-2.2.2
+      runs-on: ubuntu-latest
+
   base-gpu-notebook-cuda11:
     uses: ./.github/workflows/docker-build-test-upload.yml
     with:

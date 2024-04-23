@@ -69,13 +69,18 @@ jobs:
           image: ${{ inputs.parent-image }}
           variant: ${{ inputs.parent-variant }}
 
+      - name: Source image 📥
+        if: inputs.parent-image == ''
+        run: docker pull ${{ inputs.image }}:${{ inputs.variant }}
+        shell: bash
+
       - name: Build base image 🛠
         if: contains(inputs.image, 'base-gpu-notebook')
         run: | 
           # generate dockerfile
           cd base-gpu-notebook && bash generate_dockerfile.sh && cd ..
           # build docker
-          docker build --rm --force-rm --tag ${{ env.REGISTRY }}/${{ env.OWNER }}/${{ inputs.image }} ${{ inputs.image }}/.build/${{ inputs.variant != 'default' && inputs.variant || '.' }}/ --build-arg REGISTRY=${{ env.REGISTRY }} --build-arg OWNER=${{ env.OWNER }}
+          docker build --rm --force-rm --tag ${{ env.REGISTRY }}/${{ env.OWNER }}/${{ inputs.image }}:${{ inputs.variant }} ${{ inputs.image }}/.build/${{ inputs.variant != 'default' && inputs.variant || '.' }}/ --build-arg REGISTRY=${{ env.REGISTRY }} --build-arg OWNER=${{ env.OWNER }}
         env:
           DOCKER_BUILDKIT: 1
           # Full logs for CI build
@@ -83,7 +88,7 @@ jobs:
         shell: bash
 
       - name: Build image 🛠
-        run: docker build --rm --force-rm --tag ${{ env.REGISTRY }}/${{ env.OWNER }}/${{ inputs.image }} ${{ inputs.image }}/${{ inputs.variant != 'default' && inputs.variant || '.' }}/ --build-arg REGISTRY=${{ env.REGISTRY }} --build-arg OWNER=${{ env.OWNER }}
+        run: docker build --rm --force-rm --tag ${{ env.REGISTRY }}/${{ env.OWNER }}/${{ inputs.image }}:${{ inputs.variant }} ${{ inputs.image }}/${{ inputs.variant != 'default' && inputs.variant || '.' }}/ --build-arg REGISTRY=${{ env.REGISTRY }} --build-arg OWNER=${{ env.OWNER }}
         env:
           DOCKER_BUILDKIT: 1
           # Full logs for CI build
@@ -93,11 +98,11 @@ jobs:
       - name: Save image as a tar for later use 💾
         run: |
           mkdir -p /tmp/a2s/images/
-          docker save ${{ env.REGISTRY }}/${{ env.OWNER }}/${{ inputs.image }} | zstd > /tmp/a2s/images/${{ inputs.image }}-${{ inputs.variant }}.tar.zst
+          docker save ${{ env.REGISTRY }}/${{ env.OWNER }}/${{ inputs.image }}:${{ inputs.variant }} | zstd > /tmp/a2s/images/${{ inputs.image }}:${{ inputs.variant }}.tar.zst
         shell: bash
       - name: Upload image as artifact 💾
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ inputs.image }}-${{ inputs.variant }}
-          path: /tmp/a2s/images/${{ inputs.image }}-${{ inputs.variant }}.tar.zst
+          name: ${{ inputs.image }}:${{ inputs.variant }}
+          path: /tmp/a2s/images/${{ inputs.image }}:${{ inputs.variant }}.tar.zst
           retention-days: 3
