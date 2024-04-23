@@ -62,7 +62,7 @@ jobs:
           rm -rf /tmp/a2s/
         shell: bash
 
-      - name: Load parent built image to Docker 📥
+      - name: Load parent image to Docker 📥
         if: inputs.parent-image != ''
         uses: ./.github/actions/load-image
         with:
@@ -88,6 +88,7 @@ jobs:
         shell: bash
 
       - name: Build image 🛠
+        if: inputs.parent-image != ''
         run: docker build --rm --force-rm --tag ${{ env.REGISTRY }}/${{ env.OWNER }}/${{ inputs.image }}:${{ inputs.variant }} ${{ inputs.image }}/${{ inputs.variant != 'default' && inputs.variant || '.' }}/ --build-arg REGISTRY=${{ env.REGISTRY }} --build-arg OWNER=${{ env.OWNER }}
         env:
           DOCKER_BUILDKIT: 1
