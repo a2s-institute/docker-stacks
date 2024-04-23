@@ -60,6 +60,7 @@ jobs:
       parent-variant: cuda11-pytorch-2.2.2
       image: base-gpu-notebook
       variant: cuda11-pytorch-2.2.2
+      push: ${{ github.event_name == 'push' }}
       runs-on: ubuntu-latest
     needs: [source-cuda11-pytorch_2_2_2]
 
@@ -70,6 +71,7 @@ jobs:
       parent-variant: cuda12-pytorch-2.2.2
       image: base-gpu-notebook
       variant: cuda12-pytorch-2.2.2
+      push: ${{ github.event_name == 'push' }}
       runs-on: ubuntu-latest
     needs: [source-cuda12-pytorch_2_2_2]
 
@@ -80,6 +82,7 @@ jobs:
       parent-variant: cuda11-pytorch-2.2.2
       image: ml-notebook
       variant: cuda11-pytorch-2.2.2
+      push: ${{ github.event_name == 'push' }}
       runs-on: ubuntu-latest
     needs: [base-gpu-notebook-cuda11]
 
@@ -90,6 +93,7 @@ jobs:
       parent-variant: cuda12-pytorch-2.2.2
       image: ml-notebook
       variant: cuda12-pytorch-2.2.2
+      push: ${{ github.event_name == 'push' }}
       runs-on: ubuntu-latest
     needs: [base-gpu-notebook-cuda12]
 
@@ -100,6 +104,7 @@ jobs:
       parent-variant: cuda11-pytorch-2.2.2
       image: nlp-notebook
       variant: cuda11-pytorch-2.2.2
+      push: ${{ github.event_name == 'push' }}
       runs-on: ubuntu-latest
     needs: [ml-notebook-cuda11]
 
@@ -110,36 +115,7 @@ jobs:
       parent-variant: cuda11-pytorch-2.2.2
       image: nlp-notebook
       variant: cuda12-pytorch-2.2.2
+      push: ${{ github.event_name == 'push' }}
       runs-on: ubuntu-latest
     needs: [ml-notebook-cuda12]
-
-  images-tag-push:
-    uses: ./.github/workflows/docker-tag-push.yml
-    with:
-      image: ${{ matrix.image-variant.image }}
-      variant: ${{ matrix.image-variant.variant }}
-    secrets:
-      REGISTRY_USERNAME: ${{ secrets.QUAY_USERNAME }}
-      REGISTRY_TOKEN: ${{ secrets.QUAY_ROBOT_TOKEN }}
-    strategy:
-      matrix:
-        image-variant:
-          [
-            { image: gpu-base-notebook, variant: default },
-            { image: ml-notebook, variant: default },
-            { image: nlp-notebook, variant: default },
-          ]
-    needs:
-      [
-        source-cuda11-pytorch_2_2_2,
-        source-cuda12-pytorch_2_2_2,
-        base-gpu-notebook-cuda11,
-        base-gpu-notebook-cuda12,
-        ml-notebook-cuda11,
-        ml-notebook-cuda12,
-        nlp-notebook-cuda11,
-        nlp-notebook-cuda12,
-      ]
-    if: ${{ !contains(github.event.pull_request.title, '[FAST_BUILD]') }}
-
 
