@@ -1,7 +1,6 @@
 name: Download a parent image, build a new one, and test it; then upload the image, tags, and manifests to GitHub artifacts
 
 env:
-  REGISTRY: quay.io
   OWNER: ${{ github.repository_owner }}
 
 on:
@@ -25,6 +24,11 @@ on:
         required: false
         type: string
         default: default
+      registry:
+        description: Registry
+        required: false
+        type: string
+        default: quay.io
       push:
         description: Publish image to registry
         type: boolean
@@ -67,6 +71,22 @@ jobs:
           rm -rf /tmp/a2s/
         shell: bash
       
+      - name: Login to ghcr.io
+        if: ${{ inputs.registry == 'ghcr.io' }}
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.GH_USERNAME }}
+          password: ${{ secrets.GH_TOKEN }}
+
+      - name: Login to Quay Container Registry
+        if: ${{ inputs.registry == 'quay.io' }}
+        uses: docker/login-action@v3
+        with:
+          registry: quay.io
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_ROBOT_TOKEN }}
+
       - name: Load parent image to Docker 📥
         if: inputs.parent-image != ''
         uses: ./.github/actions/load-image
@@ -80,27 +100,28 @@ jobs:
         run: docker pull quay.io/jupyter/${{ inputs.image }}:${{ inputs.variant }}
         shell: bash
 
-      - name: Build base image 🛠
+      - name: Generate base image Dockerfile
         if: contains(inputs.image, 'base-gpu-notebook')
         run: | 
           # generate dockerfile
           cd base-gpu-notebook && bash generate_dockerfile.sh && cd ..
-          # build docker
-          docker build --rm --force-rm --tag ${{ env.REGISTRY }}/${{ env.OWNER }}/${{ inputs.image }}:${{ inputs.variant }} ${{ inputs.image }}/.build/${{ inputs.variant != 'default' && inputs.variant || '.' }}/ --build-arg REGISTRY=${{ env.REGISTRY }} --build-arg OWNER=${{ env.OWNER }}
-        env:
-          DOCKER_BUILDKIT: 1
-          # Full logs for CI build
-          BUILDKIT_PROGRESS: plain
-        shell: bash
+
+      - name: Build base image 🛠
+        if: contains(inputs.image, 'base-gpu-notebook')
+        id: build_base_image
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ inputs.image }}/.build/${{ inputs.variant }}/ 
+          push: ${{ inputs.push }}
+          tags: ${{ inputs.registry }}/{{ env.OWNER }}/${{ inputs.image }}:${{ inputs.variant }}
 
       - name: Build image 🛠
-        if: inputs.parent-image != ''
-        run: docker build --rm --force-rm --tag ${{ env.REGISTRY }}/${{ env.OWNER }}/${{ inputs.image }}:${{ inputs.variant }} ${{ inputs.image }}/${{ inputs.variant != 'default' && inputs.variant || '.' }}/ --build-arg REGISTRY=${{ env.REGISTRY }} --build-arg OWNER=${{ env.OWNER }}
-        env:
-          DOCKER_BUILDKIT: 1
-          # Full logs for CI build
-          BUILDKIT_PROGRESS: plain
-        shell: bash
+        id: build_image
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ inputs.image }}/${{ inputs.variant }}/ 
+          push: ${{ inputs.push }}
+          tags: ${{ inputs.registry }}/{{ env.OWNER }}/${{ inputs.image }}:${{ inputs.variant }}
 
       - name: Save source image as a tar for later use 💾
         if: inputs.parent-image == ''
