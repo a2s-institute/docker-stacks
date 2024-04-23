@@ -116,7 +116,7 @@ jobs:
           tags: ${{ inputs.registry }}/${{ env.OWNER }}/${{ inputs.image }}:${{ inputs.variant }}
 
       - name: Build image 🛠
-        if: inputs.parent-image != ''
+        if: ${{ inputs.parent-image != '' || !contains(inputs.image, 'base-gpu-notebook')}}
         id: build_image
         uses: docker/build-push-action@v5
         with:
@@ -135,7 +135,7 @@ jobs:
         if: inputs.parent-image != ''
         run: |
           mkdir -p /tmp/a2s/images/
-          docker save ${{ env.REGISTRY }}/${{ env.OWNER }}/${{ inputs.image }}:${{ inputs.variant }} | zstd > /tmp/a2s/images/${{ inputs.image }}--${{ inputs.variant }}.tar.zst
+          docker save ${{ env.registry }}/${{ env.OWNER }}/${{ inputs.image }}:${{ inputs.variant }} | zstd > /tmp/a2s/images/${{ inputs.image }}--${{ inputs.variant }}.tar.zst
         shell: bash
 
       - name: Upload image as artifact 💾
