@@ -59,7 +59,7 @@ jobs:
       - name: Download tags file 📥
         uses: actions/download-artifact@v4
         with:
-          name: ${{ inputs.image }}:${{ inputs.variant }}
+          name: ${{ inputs.image }}--${{ inputs.variant }}
           path: /tmp/a2s/tags/
 
       - name: Push Images to Registry 📤
