@@ -36,42 +36,48 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  source-cuda11-pytorch-2.2.2:
+  # source image is based on jupyter/pytorch-notebook
+  source-cuda11-pytorch-2_2_2:
     uses: ./.github/workflows/docker-build-test-upload.yml
     with:
       parent-image: ""
-      image: jupyter/pytorch-notebook
+      image: pytorch-notebook
       variant: cuda11-pytorch-2.2.2
       runs-on: ubuntu-latest
 
-  source-cuda12-pytorch-2.2.2:
+  source-cuda12-pytorch-2_2_2:
     uses: ./.github/workflows/docker-build-test-upload.yml
     with:
       parent-image: ""
-      image: jupyter/pytorch-notebook
+      image: pytorch-notebook
       variant: cuda12-pytorch-2.2.2
       runs-on: ubuntu-latest
 
   base-gpu-notebook-cuda11:
     uses: ./.github/workflows/docker-build-test-upload.yml
     with:
-      parent-image: jupyter/pytorch-notebook:cuda11-pytorch-2.2.2
+      parent-image: pytorch-notebook
+      parent-variant: cuda11-pytorch-2.2.2
       image: base-gpu-notebook
       variant: cuda11-pytorch-2.2.2
       runs-on: ubuntu-latest
+    needs: [source-cuda11-pytorch_2_2_2]
 
   base-gpu-notebook-cuda12:
     uses: ./.github/workflows/docker-build-test-upload.yml
     with:
-      parent-image: jupyter/pytorch-notebook:cuda12-pytorch-2.2.2
+      parent-image: pytorch-notebook
+      parent-variant: cuda12-pytorch-2.2.2
       image: base-gpu-notebook
       variant: cuda12-pytorch-2.2.2
       runs-on: ubuntu-latest
+    needs: [source-cuda12-pytorch_2_2_2]
 
   ml-notebook-cuda11:
     uses: ./.github/workflows/docker-build-test-upload.yml
     with:
-      parent-image: base-gpu-notebook-cuda11
+      parent-image: base-gpu-notebook
+      parent-variant: cuda11-pytorch-2.2.2
       image: ml-notebook
       variant: cuda11-pytorch-2.2.2
       runs-on: ubuntu-latest
@@ -81,6 +87,7 @@ jobs:
     uses: ./.github/workflows/docker-build-test-upload.yml
     with:
       parent-image: base-gpu-notebook
+      parent-variant: cuda12-pytorch-2.2.2
       image: ml-notebook
       variant: cuda12-pytorch-2.2.2
       runs-on: ubuntu-latest
@@ -89,7 +96,8 @@ jobs:
   nlp-notebook-cuda11:
     uses: ./.github/workflows/docker-build-test-upload.yml
     with:
-      parent-image: ml-notebook-cuda11
+      parent-image: ml-notebook
+      parent-variant: cuda11-pytorch-2.2.2
       image: nlp-notebook
       variant: cuda11-pytorch-2.2.2
       runs-on: ubuntu-latest
@@ -99,6 +107,7 @@ jobs:
     uses: ./.github/workflows/docker-build-test-upload.yml
     with:
       parent-image: ml-notebook
+      parent-variant: cuda11-pytorch-2.2.2
       image: nlp-notebook
       variant: cuda12-pytorch-2.2.2
       runs-on: ubuntu-latest
@@ -122,6 +131,8 @@ jobs:
           ]
     needs:
       [
+        source-cuda11-pytorch-2_2_2,
+        source-cuda12-pytorch-2_2_2,
         base-gpu-notebook-cuda11,
         base-gpu-notebook-cuda12,
         ml-notebook-cuda11,
