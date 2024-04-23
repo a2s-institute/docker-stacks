@@ -123,7 +123,7 @@ jobs:
           path: /tmp/a2s/images/${{ inputs.image }}--${{ inputs.variant }}.tar.zst
           retention-days: 3
 
-  images-tag-push:
+  image-push:
     needs: [build-test-upload] 
     uses: ./.github/workflows/docker-tag-push.yml
     if: inputs.push == true
