@@ -116,7 +116,8 @@ jobs:
           tags: ${{ inputs.registry }}/${{ env.OWNER }}/${{ inputs.image }}:${{ inputs.variant }}
 
       - name: Build image 🛠
-        if: ${{ inputs.parent-image != '' || !contains(inputs.image, 'base-gpu-notebook')}}
+        if: | 
+          inputs.parent-image != '' || !contains(inputs.image, 'base-gpu-notebook')
         id: build_image
         uses: docker/build-push-action@v5
         with:
