@@ -39,6 +39,7 @@ jobs:
   # source image is based on jupyter/pytorch-notebook
   source-cuda11-pytorch_2_2_2:
     uses: ./.github/workflows/docker-build-test-upload.yml
+    secrets: inherit
     with:
       parent-image: ""
       image: pytorch-notebook
@@ -48,6 +49,7 @@ jobs:
   # cuda 11
   base-gpu-notebook-cuda11:
     needs: [source-cuda11-pytorch_2_2_2]
+    secrets: inherit
     uses: ./.github/workflows/docker-build-test-upload.yml
     with:
       parent-image: pytorch-notebook
@@ -59,6 +61,7 @@ jobs:
   
   ml-notebook-cuda11:
     needs: [base-gpu-notebook-cuda11]
+    secrets: inherit
     uses: ./.github/workflows/docker-build-test-upload.yml
     with:
       parent-image: base-gpu-notebook
@@ -70,6 +73,7 @@ jobs:
 
   nlp-notebook-cuda11:
     needs: [ml-notebook-cuda11]
+    secrets: inherit
     uses: ./.github/workflows/docker-build-test-upload.yml
     with:
       parent-image: ml-notebook
@@ -82,6 +86,7 @@ jobs:
   # cuda12
   source-cuda12-pytorch_2_2_2:
     uses: ./.github/workflows/docker-build-test-upload.yml
+    secrets: inherit
     with:
       parent-image: ""
       image: pytorch-notebook
@@ -91,6 +96,7 @@ jobs:
   
   base-gpu-notebook-cuda12:
     needs: [source-cuda12-pytorch_2_2_2]
+    secrets: inherit
     uses: ./.github/workflows/docker-build-test-upload.yml
     with:
       parent-image: pytorch-notebook
@@ -102,6 +108,7 @@ jobs:
 
   ml-notebook-cuda12:
     needs: [base-gpu-notebook-cuda12]
+    secrets: inherit
     uses: ./.github/workflows/docker-build-test-upload.yml
     with:
       parent-image: base-gpu-notebook
@@ -113,6 +120,7 @@ jobs:
 
   nlp-notebook-cuda12:
     needs: [ml-notebook-cuda12]
+    secrets: inherit
     uses: ./.github/workflows/docker-build-test-upload.yml
     with:
       parent-image: ml-notebook
