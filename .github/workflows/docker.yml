@@ -54,6 +54,7 @@ jobs:
       runs-on: ubuntu-latest
 
   base-gpu-notebook-cuda11:
+    if: ${{ startsWith(github.event.head_commit.modified, 'base-gpu-notebook') }}
     uses: ./.github/workflows/docker-build-test-upload.yml
     with:
       parent-image: pytorch-notebook
@@ -65,6 +66,7 @@ jobs:
     needs: [source-cuda11-pytorch_2_2_2]
 
   base-gpu-notebook-cuda12:
+    if: ${{ startsWith(github.event.head_commit.modified, 'base-gpu-notebook') }}
     uses: ./.github/workflows/docker-build-test-upload.yml
     with:
       parent-image: pytorch-notebook
@@ -76,6 +78,7 @@ jobs:
     needs: [source-cuda12-pytorch_2_2_2]
 
   ml-notebook-cuda11:
+    if: ${{ startsWith(github.event.head_commit.modified, 'base-gpu-notebook' || startsWith(github.event.head_commit.modified, 'ml-notebook/cuda11-pytorch-2.2.2/')) }}
     uses: ./.github/workflows/docker-build-test-upload.yml
     with:
       parent-image: base-gpu-notebook
@@ -87,6 +90,7 @@ jobs:
     needs: [base-gpu-notebook-cuda11]
 
   ml-notebook-cuda12:
+    if: ${{ startsWith(github.event.head_commit.modified, 'base-gpu-notebook' || startsWith(github.event.head_commit.modified, 'ml-notebook/cuda12-pytorch-2.2.2/')) }}
     uses: ./.github/workflows/docker-build-test-upload.yml
     with:
       parent-image: base-gpu-notebook
