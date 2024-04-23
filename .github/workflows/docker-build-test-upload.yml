@@ -113,7 +113,7 @@ jobs:
         with:
           context: ${{ inputs.image }}/.build/${{ inputs.variant }}/ 
           push: ${{ inputs.push }}
-          tags: ${{ inputs.registry }}/{{ env.OWNER }}/${{ inputs.image }}:${{ inputs.variant }}
+          tags: ${{ inputs.registry }}/${{ env.OWNER }}/${{ inputs.image }}:${{ inputs.variant }}
 
       - name: Build image 🛠
         id: build_image
@@ -121,7 +121,7 @@ jobs:
         with:
           context: ${{ inputs.image }}/${{ inputs.variant }}/ 
           push: ${{ inputs.push }}
-          tags: ${{ inputs.registry }}/{{ env.OWNER }}/${{ inputs.image }}:${{ inputs.variant }}
+          tags: ${{ inputs.registry }}/${{ env.OWNER }}/${{ inputs.image }}:${{ inputs.variant }}
 
       - name: Save source image as a tar for later use 💾
         if: inputs.parent-image == ''
