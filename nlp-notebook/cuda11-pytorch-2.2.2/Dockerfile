@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=ghcr.io/a2s-institute/docker-stacks/ml-notebook:cuda11-pytorch-2.2.2
+ARG BASE_IMAGE=quay.io/a2s-institute/ml-notebook:cuda11-pytorch-2.2.2
 
 FROM $BASE_IMAGE
 
