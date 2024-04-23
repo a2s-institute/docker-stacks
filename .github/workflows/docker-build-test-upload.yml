@@ -116,6 +116,7 @@ jobs:
           tags: ${{ inputs.registry }}/${{ env.OWNER }}/${{ inputs.image }}:${{ inputs.variant }}
 
       - name: Build image 🛠
+        if: inputs.parent-image != ''
         id: build_image
         uses: docker/build-push-action@v5
         with:
