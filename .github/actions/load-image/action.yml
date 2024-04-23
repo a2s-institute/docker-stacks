@@ -6,9 +6,6 @@ inputs:
   image:
     description: Image name
     required: true
-  platform:
-    description: Image platform
-    required: true
   variant:
     description: Variant tag prefix
     required: true
@@ -23,6 +20,6 @@ runs:
         path: /tmp/a2s/images/
     - name: Load downloaded image to docker 📥
       run: |
-        zstd --uncompress --stdout --rm /tmp/a2s/images/${{ inputs.image }}-${{ inputs.platform }}-${{ inputs.variant }}.tar.zst | docker load
+        zstd --uncompress --stdout --rm /tmp/a2s/images/${{ inputs.image }}--${{ inputs.variant }}.tar.zst | docker load
         docker image ls --all
       shell: bash
