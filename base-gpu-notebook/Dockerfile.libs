@@ -10,7 +10,7 @@ ENV CODE_VERSION=$CODE_VERSION
 
 RUN apt update -y -qq \
     && apt install -y apt-utils libgl1-mesa-dev vim htop curl software-properties-common \
-    && apt install -y cmake libncurses5-dev libncursesw5-dev git sox zip \
+    && apt install -y cmake gnupg libncurses5-dev libncursesw5-dev git sox zip \
     && add-apt-repository ppa:flexiondotorg/nvtop \
     && apt install -y nvtop \
     && apt-get -y -qq install \
