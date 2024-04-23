@@ -4,7 +4,7 @@
 CONTAINER_REGISTRY=""
 PUBLISH="all"
 IMAGE="base-gpu-notebook"
-CUDA_VERSION="cuda11.8.0-ubuntu20.04"
+TAG="cuda11.8.0-ubuntu20.04"
 
 show_help() {
   echo "Usage: bash build-and-deploy.sh"
@@ -14,7 +14,7 @@ show_help() {
   echo "-r, --registry                container registry e.g. ghcr.io for GitHub container registry, default: docker hub"
   echo "-p, --publish                 option whether to publish <all> or <latest> (default: all), all means publish all tags"
   echo "-i, --image                   image to build or publish"
-  echo "-c, --cuda-version            cuda version to build cuda11.3.1-ubuntu20.04|cuda11.8.0-ubuntu20.04|all (default: all)"
+  echo "-c, --tag            cuda version to build cuda11.3.1-ubuntu20.04|cuda11.8.0-ubuntu20.04|all (default: all)"
 }
 
 parse_args() {
@@ -36,9 +36,9 @@ parse_args() {
         IMAGE="$2"
         shift 2
         ;;
-      -c|--cuda-version)
-        CUDA_VERSION="$2"
-        CUDA_VERSION_PROVIDED=true
+      -c|--tag)
+        TAG="$2"
+        TAG_PROVIDED=true
         shift 2
         ;;
       *)
@@ -66,13 +66,14 @@ function build_and_publish_single_image {
   IMAGE_DIR=$1
   IMAGE_TAG=$2
   PORT=$3
-
-  if ! docker build -t $IMAGE_TAG $IMAGE_DIR; then
+  
+  echo "Building docker build -t $IMAGE_TAG $IMAGE_DIR"
+  if ! docker build --rm --force-rm --tag $IMAGE_TAG $IMAGE_DIR; then
     echo "Docker build failed $IMAGE_TAG"
     exit 1
   fi
 
-  if docker run -it --rm -d -p $PORT:$PORT $IMAGE_TAG;
+  if docker run -it --rm -d -p $PORT:8888 $IMAGE_TAG;
   then
     echo "$IMAGE_TAG is running";
   else
@@ -94,10 +95,10 @@ function build_base_image {
   bash generate_dockerfile.sh
   
   BASE_PORT=7070
-  CUDA_VERSION_DIR=$1
-  IMAGE_DIR=.build/$CUDA_VERSION_DIR
+  TAG_DIR=$1
+  IMAGE_DIR=.build/$TAG_DIR
 
-  IMAGE_TAG=$CONTAINER_REG_OWNER/$IMAGE:$CUDA_VERSION_DIR
+  IMAGE_TAG=$CONTAINER_REG_OWNER/$IMAGE:$TAG_DIR
   echo "Building base image $IMAGE_TAG"
   build_and_publish_single_image $IMAGE_DIR $IMAGE_TAG $BASE_PORT
   cd ..
@@ -106,8 +107,8 @@ function build_base_image {
 function build_image {
   cd $IMAGE
   NB_PORT=8080
-  CUDA_VERSION_DIR=$1
-  IMAGE_DIR=$CUDA_VERSION_DIR
+  TAG_DIR=$1
+  IMAGE_DIR=$TAG_DIR
 
   IMAGE_TAG=$CONTAINER_REG_OWNER/$IMAGE:$IMAGE_DIR
   echo "Building image $IMAGE_TAG"
@@ -119,14 +120,26 @@ function build_image {
 function main {
   if [ "$IMAGE" = "base-gpu-notebook" ]
   then
-    echo "Building $IMAGE $CUDA_VERSION"
-    build_base_image $CUDA_VERSION
+    echo "Building $IMAGE $TAG"
+    build_base_image $TAG
   elif [ "$IMAGE" = "gpu-notebook" ]
   then
-    echo "Building $IMAGE $CUDA_VERSION"
-    build_image $CUDA_VERSION
+    echo "Building $IMAGE $TAG"
+    build_image $TAG
+  elif [ "$IMAGE" = "pytorch-notebook" ]
+  then
+    echo "Building $IMAGE $TAG"
+    build_image $TAG
+  elif [ "$IMAGE" = "ml-notebook" ]
+  then
+    echo "Building $IMAGE $TAG"
+    build_image $TAG
+  elif [ "$IMAGE" = "nlp-notebook" ]
+  then
+    echo "Building $IMAGE $TAG"
+    build_image $TAG
   else
-    echo "Unrecognized $IMAGE and $CUDA_VERSION"
+    echo "Unrecognized $IMAGE and $TAG"
   fi
 }
 
