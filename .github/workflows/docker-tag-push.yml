@@ -44,7 +44,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Load image to Docker 📥
-        uses: ./.github/actions/load-image
+        uses: ./.github/actions/load-image/action.yml
         with:
           image: ${{ inputs.image }}
           variant: ${{ inputs.variant }}

@@ -69,7 +69,7 @@ jobs:
       
       - name: Load parent image to Docker 📥
         if: inputs.parent-image != ''
-        uses: ./.github/actions/load-image
+        uses: ./.github/actions/load-image/action.yml
         with:
           image: ${{ inputs.parent-image }}
           variant: ${{ inputs.parent-variant }}
