@@ -53,11 +53,10 @@ parse_args() {
 if [ -z "$CONTAINER_REGISTRY" ]
 then
   echo "Container registry is not set!. Using docker hub registry"
-  CONTAINER_REG_OWNER=ghcr.io/a2s-institute/docker-stacks
+  CONTAINER_REG_OWNER=quay.io/a2s-institute
 else
   echo "Using $CONTAINER_REGISTRY registry"
-  OWNER=a2s-institute/docker-stacks
-  CONTAINER_REG_OWNER=$CONTAINER_REGISTRY/$OWNER
+  CONTAINER_REG_OWNER=$CONTAINER_REGISTRY/a2s-institute
 fi
 
 echo "Container registry/owner = $CONTAINER_REG_OWNER"
