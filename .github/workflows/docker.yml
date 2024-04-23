@@ -20,6 +20,7 @@ on:
     branches:
       - main
       - master
+      - ci-test
     paths:
       - ".github/workflows/docker.yml"
       - ".github/workflows/docker-build-test-upload.yml"
@@ -56,6 +57,7 @@ jobs:
       parent-variant: cuda11-pytorch-2.2.2
       image: base-gpu-notebook
       variant: cuda11-pytorch-2.2.2
+      context: base-gpu-notebook/.build/cuda11-pytorch-2.2.2/
       push: ${{ github.event_name == 'push' }}
       runs-on: ubuntu-latest
   
@@ -68,6 +70,7 @@ jobs:
       parent-variant: cuda11-pytorch-2.2.2
       image: ml-notebook
       variant: cuda11-pytorch-2.2.2
+      context: ml-notebook/cuda11-pytorch-2.2.2/
       push: ${{ github.event_name == 'push' }}
       runs-on: ubuntu-latest
 
@@ -80,6 +83,7 @@ jobs:
       parent-variant: cuda11-pytorch-2.2.2
       image: nlp-notebook
       variant: cuda11-pytorch-2.2.2
+      context: nlp-notebook/cuda11-pytorch-2.2.2/
       push: ${{ github.event_name == 'push' }}
       runs-on: ubuntu-latest
 
@@ -103,6 +107,7 @@ jobs:
       parent-variant: cuda12-pytorch-2.2.2
       image: base-gpu-notebook
       variant: cuda12-pytorch-2.2.2
+      context: base-gpu-notebook/.build/cuda12-pytorch-2.2.2/
       push: ${{ github.event_name == 'push' }}
       runs-on: ubuntu-latest
 
@@ -115,6 +120,7 @@ jobs:
       parent-variant: cuda12-pytorch-2.2.2
       image: ml-notebook
       variant: cuda12-pytorch-2.2.2
+      context: ml-notebook/cuda12-pytorch-2.2.2/
       push: ${{ github.event_name == 'push' }}
       runs-on: ubuntu-latest
 
@@ -124,9 +130,10 @@ jobs:
     uses: ./.github/workflows/docker-build-test-upload.yml
     with:
       parent-image: ml-notebook
-      parent-variant: cuda11-pytorch-2.2.2
+      parent-variant: cuda12-pytorch-2.2.2
       image: nlp-notebook
       variant: cuda12-pytorch-2.2.2
+      context: nlp-notebook/cuda12-pytorch-2.2.2/
       push: ${{ github.event_name == 'push' }}
       runs-on: ubuntu-latest
 
