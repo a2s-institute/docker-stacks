@@ -37,24 +37,15 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # source image is based on jupyter/pytorch-notebook
-  source-cuda11-pytorch_2_2_2:
-    uses: ./.github/workflows/docker-build-test-upload.yml
-    secrets: inherit
-    with:
-      parent-image: ""
-      image: pytorch-notebook
-      variant: cuda11-pytorch-2.2.2
-      runs-on: ubuntu-latest
-
   # cuda 11
   base-gpu-notebook-cuda11:
     needs: [source-cuda11-pytorch_2_2_2]
     secrets: inherit
     uses: ./.github/workflows/docker-build-test-upload.yml
     with:
-      parent-image: pytorch-notebook
-      parent-variant: cuda11-pytorch-2.2.2
+      parent-image: ''
+      parent-variant: ''
+      load-parent: false # base does not need parent from artifact
       image: base-gpu-notebook
       variant: cuda11-pytorch-2.2.2
       context: base-gpu-notebook/.build/cuda11-pytorch-2.2.2/
@@ -88,23 +79,13 @@ jobs:
       runs-on: ubuntu-latest
 
   # cuda12
-  source-cuda12-pytorch_2_2_2:
-    uses: ./.github/workflows/docker-build-test-upload.yml
-    secrets: inherit
-    with:
-      parent-image: ""
-      image: pytorch-notebook
-      variant: cuda12-pytorch-2.2.2
-      push: ${{ github.event_name == 'push' }}
-      runs-on: ubuntu-latest
-  
   base-gpu-notebook-cuda12:
-    needs: [source-cuda12-pytorch_2_2_2]
     secrets: inherit
     uses: ./.github/workflows/docker-build-test-upload.yml
     with:
-      parent-image: pytorch-notebook
-      parent-variant: cuda12-pytorch-2.2.2
+      parent-image: ''
+      parent-variant: ''
+      load-parent: false # base does not need parent from artifact
       image: base-gpu-notebook
       variant: cuda12-pytorch-2.2.2
       context: base-gpu-notebook/.build/cuda12-pytorch-2.2.2/
@@ -157,11 +138,13 @@ jobs:
     with:
       parent-image: ''
       parent-variant: ''
+      load-parent: false # base does not need parent from artifact
       image: base-gpu-notebook
       variant: cuda12-ubuntu20.04
       context: base-gpu-notebook/.build/cuda12-ubuntu20.04
       push: ${{ github.event_name == 'push' }}
       runs-on: ubuntu-latest
+
   cuda12-ros-noetic:
     needs: [cuda12-ubuntu20_04]
     secrets: inherit

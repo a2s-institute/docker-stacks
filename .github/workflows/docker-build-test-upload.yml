@@ -8,13 +8,19 @@ on:
     inputs:
       parent-image:
         description: Parent image name
-        required: true
+        required: false
         type: string
+        default: default
       parent-variant:
         description: Parent variant tag prefix
         required: false
         type: string
         default: default
+      load-parent:
+        description: Load parent image from GH artifact
+        type: boolean
+        required: false
+        default: true
       image:
         description: Image name
         required: true
@@ -93,17 +99,11 @@ jobs:
           password: ${{ secrets.QUAY_ROBOT_TOKEN }}
 
       - name: Load parent image to Docker 📥
-        if: inputs.parent-image != ''
+        if: inputs.load-parent == true
         uses: ./.github/actions/load-image
         with:
           image: ${{ inputs.parent-image }}
           variant: ${{ inputs.parent-variant }}
-
-      # Source/initial image is always based on jupyter/pytorch-notebook
-      - name: Pull source image 📥
-        if: inputs.parent-image == ''
-        run: docker pull quay.io/jupyter/${{ inputs.image }}:${{ inputs.variant }}
-        shell: bash
 
       - name: Generate base image Dockerfile
         if: contains(inputs.image, 'base-gpu-notebook')
@@ -112,7 +112,6 @@ jobs:
           cd base-gpu-notebook && bash generate_dockerfile.sh && cd ..
 
       - name: Build image 🛠
-        if: inputs.parent-image != ''
         id: build_image
         uses: docker/build-push-action@v5
         with:
@@ -121,14 +120,12 @@ jobs:
           tags: ${{ inputs.registry }}/${{ env.OWNER }}/${{ inputs.image }}:${{ inputs.variant }}
 
       - name: Save source image as a tar for later use 💾
-        if: inputs.parent-image == ''
         run: |
           mkdir -p /tmp/a2s/images/
           docker save quay.io/jupyter/${{ inputs.image }}:${{ inputs.variant }} | zstd > /tmp/a2s/images/${{ inputs.image }}--${{ inputs.variant }}.tar.zst
         shell: bash
 
       - name: Save image as a tar for later use 💾
-        if: inputs.parent-image != ''
         run: |
           mkdir -p /tmp/a2s/images/
           docker save ${{ inputs.registry }}/${{ env.OWNER }}/${{ inputs.image }}:${{ inputs.variant }} | zstd > /tmp/a2s/images/${{ inputs.image }}--${{ inputs.variant }}.tar.zst
