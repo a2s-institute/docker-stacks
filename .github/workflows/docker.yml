@@ -150,3 +150,27 @@ jobs:
       push: ${{ github.event_name == 'push' }}
       runs-on: ubuntu-latest
 
+  # cuda12-ubuntu20.04 for ros noetic
+  cuda12-ubuntu20.04:
+    secrets: inherit
+    uses: ./.github/workflows/docker-build-test-upload.yml
+    with:
+      parent-image: ''
+      parent-variant: ''
+      image: base-gpu-notebook
+      variant: cuda12-ubuntu20.04
+      context: base-gpu-notebook/.build/cuda12-ubuntu20.04
+      push: ${{ github.event_name == 'push' }}
+      runs-on: ubuntu-latest
+  cuda12-ros-noetic:
+    needs: [cuda11-ubuntu20.04]
+    secrets: inherit
+    uses: ./.github/workflows/docker-build-test-upload.yml
+    with:
+      parent-image: base-gpu-notebook
+      parent-variant: cuda12-ubuntu20.04
+      image: ros
+      variant: cuda12-noetic
+      context: ros/cuda12-noetic
+      push: ${{ github.event_name == 'push' }}
+      runs-on: ubuntu-latest
