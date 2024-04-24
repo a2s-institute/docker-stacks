@@ -13,26 +13,14 @@ function generate_dockerfile {
 
   echo "
   ############################################################################
-  #################### Dependency: jupyter/pytorch-notebook ##################
+  #################### Base image ############################################
   ############################################################################
   " >> $DOCKERFILE
 
   cat $CUDA_VERSION_DIR/Dockerfile >> $DOCKERFILE
 
-  echo "
-  ############################################################################
-  #################### Dependency: xfce4 desktop cfg #########################
-  ############################################################################
-  " >> $DOCKERFILE
-
   # Copy xfce desktop configuration
   cp user-dirs.defaults $BUILD_DIR
-
-  echo "
-  ############################################################################
-  ################# Dependency: a2s cluster dependencies #####################
-  ############################################################################
-  " >> $DOCKERFILE
 
   cat Dockerfile.libs >> $DOCKERFILE
   rsync --exclude 'Dockerfile' $CUDA_VERSION_DIR/* $BUILD_DIR/
