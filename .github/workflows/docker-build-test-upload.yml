@@ -119,12 +119,6 @@ jobs:
           push: ${{ inputs.push }}
           tags: ${{ inputs.registry }}/${{ env.OWNER }}/${{ inputs.image }}:${{ inputs.variant }}
 
-      - name: Save source image as a tar for later use 💾
-        run: |
-          mkdir -p /tmp/a2s/images/
-          docker save quay.io/jupyter/${{ inputs.image }}:${{ inputs.variant }} | zstd > /tmp/a2s/images/${{ inputs.image }}--${{ inputs.variant }}.tar.zst
-        shell: bash
-
       - name: Save image as a tar for later use 💾
         run: |
           mkdir -p /tmp/a2s/images/
