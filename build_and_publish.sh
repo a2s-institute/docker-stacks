@@ -137,6 +137,10 @@ function main {
   then
     echo "Building $IMAGE $TAG"
     build_image $TAG
+  elif [ "$IMAGE" = "qgis" ]
+  then
+    echo "Building $IMAGE $TAG"
+    build_image $TAG
   else
     echo "Unrecognized $IMAGE and $TAG"
   fi
