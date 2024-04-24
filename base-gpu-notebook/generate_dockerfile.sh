@@ -35,6 +35,7 @@ function generate_dockerfile {
   " >> $DOCKERFILE
 
   cat Dockerfile.libs >> $DOCKERFILE
+  rsync --exclude 'Dockerfile' $CUDA_VERSION_DIR/* $BUILD_DIR/
 
 }
 
