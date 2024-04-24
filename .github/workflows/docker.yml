@@ -39,7 +39,6 @@ concurrency:
 jobs:
   # cuda 11
   base-gpu-notebook-cuda11:
-    needs: [source-cuda11-pytorch_2_2_2]
     secrets: inherit
     uses: ./.github/workflows/docker-build-test-upload.yml
     with:
