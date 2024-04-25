@@ -54,6 +54,8 @@ RUN mamba install -y "jupyter-server-proxy>=1.4" websockify -c conda-forge && \
     mamba install -y gh jupyter-resource-usage --channel conda-forge && \
     mamba install -y graphviz nb_conda_kernels && \
     pip install --no-cache-dir jupyter_remote_desktop_proxy && \
+    # Freeze typing extension required by sqlalchemy which requires TypeAliasType
+    pip install --no-cache-dir typing_extensions==4.11.0 && \
     mamba clean -afy && \
     npm cache clean --force && \
     find /opt/conda/ -follow -type f -name '*.js.map' -delete
