@@ -130,6 +130,19 @@ jobs:
       push: ${{ github.event_name == 'push' }}
       runs-on: ubuntu-latest
 
+  raster-vision-notebook-cuda12:
+    needs: [ml-notebook-cuda12]
+    secrets: inherit
+    uses: ./.github/workflows/docker-build-test-upload.yml
+    with:
+      parent-image: ml-notebook
+      parent-variant: cuda12-pytorch-2.2.2
+      image: raster-vision-notebook
+      variant: cuda12-pytorch-2.2.2
+      context: raster-vision-notebook/cuda12-pytorch-2.2.2/
+      push: ${{ github.event_name == 'push' }}
+      runs-on: ubuntu-latest
+
   # cuda12-ubuntu20.04 for ros noetic
   cuda12-ubuntu20_04:
     secrets: inherit
