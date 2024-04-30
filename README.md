@@ -10,7 +10,7 @@ The stacks contain several machine learning packages such as TensorFlow, PyTorch
 * [gpu-base-notebook:cuda*-pytorch*](https://github.com/a2s-institute/docker-stacks/tree/master/base-gpu-notebook): contains Jupyter related libraries and also includes different cuda and pytorch versions. It also has VSCode and xfce4 desktop environment.
   * [ml-notebook:cuda*-pytorch*](https://github.com/a2s-institute/docker-stacks/tree/master/ml-notebook): depends on `gpu-base-notebook` and includes several machine learning libaries such as TensorfLow, Keras, scipy, opencv, etc.
     * [nlp-notebook:cuda*-pytorch*](https://github.com/a2s-institute/docker-stacks/tree/master/nlp-notebook): depends on `ml-notebook` and includes NLP libraries such as spaCy, NLTK, llama-cpp-python and wikipedia-api.
-  * [qgis:cuda*-v*](https://github.com/a2s-institute/docker-stacks/tree/master/qgis/cuda12-v3.36.1): depends on `gpu-base-notebook`, but does not have all the ML related libraries as in `ml-notebook`.
+    * [raster-vision-notebook:cuda*-v*](https://github.com/a2s-institute/docker-stacks/tree/master/qgis/cuda12-v3.36.1): depends on `ml-notebook` and includes qgis desktop.
 * [gpu-base-notebook:cuda12-ubuntu12.04](https://github.com/a2s-institute/docker-stacks/tree/master/base-gpu-notebook/cuda12-ubuntu20.04): based on `nvidia/cuda:12.3.2-cudnn9-runtime-ubuntu20.04` and has Jupyter Notebook related components with Ubuntu 20.04.
   * [ros:cuda12-noetic](https://github.com/a2s-institute/docker-stacks/tree/master/ros/cuda12-noetic): based on `gpu-base-notebook:cuda12-ubuntu20.04` and includes `ros-noetic-desktop-full` with the gazebo simulation, but does not have  all the ML related libraries as in `ml-notebook`.
 
@@ -18,6 +18,7 @@ The stacks contain several machine learning packages such as TensorFlow, PyTorch
 ## Avilable versions
 * `quay.io/a2s-institute/gpu-base-notebook:cuda12-pytorch-2.2.2`
 * `quay.io/a2s-institute/ml-notebook:cuda12-pytorch-2.2.2`
+* `quay.io/a2s-institute/raster-vision-notebook:cuda12-pytorch-2.2.2`
 * `quay.io/a2s-institute/nlp-notebook:cuda12-pytorch-2.2.2`
 * `quay.io/a2s-institute/qgis:cuda12-v3.36.1`
 * `quay.io/a2s-institute/ros:cuda12-noetic`

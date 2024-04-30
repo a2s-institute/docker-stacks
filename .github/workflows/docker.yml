@@ -104,19 +104,6 @@ jobs:
       push: ${{ github.event_name == 'push' }}
       runs-on: ubuntu-latest
 
-  qgis-cuda12:
-    needs: [base-gpu-notebook-cuda12]
-    secrets: inherit
-    uses: ./.github/workflows/docker-build-test-upload.yml
-    with:
-      parent-image: base-gpu-notebook
-      parent-variant: cuda12-pytorch-2.2.2
-      image: qgis
-      variant: cuda12-v3.36.1
-      context: qgis/cuda12-v3.36.1/
-      push: ${{ github.event_name == 'push' }}
-      runs-on: ubuntu-latest
-
   nlp-notebook-cuda12:
     needs: [ml-notebook-cuda12]
     secrets: inherit
