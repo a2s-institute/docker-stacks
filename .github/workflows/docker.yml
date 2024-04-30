@@ -13,6 +13,7 @@ on:
       - "base-gpu-notebook/**"
       - "ml-notebook/**"
       - "nlp-notebook/**"
+      - "raster-vision-notebook/**"
       # We use local composite actions to combine multiple workflow steps within one action
       # https://docs.github.com/en/actions/creating-actions/about-custom-actions#composite-actions
       - ".github/actions/load-image/action.yml"
@@ -27,6 +28,7 @@ on:
       - "base-gpu-notebook/**"
       - "ml-notebook/**"
       - "nlp-notebook/**"
+      - "raster-vision-notebook/**"
       - ".github/actions/load-image/action.yml"
   workflow_dispatch:
 
