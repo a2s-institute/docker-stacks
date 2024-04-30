@@ -8,12 +8,12 @@ USER $NB_USER
 
 COPY requirements.txt /tmp/requirements.txt
 
-# install qgis
-RUN mamba install -y "qgis=3.36.1" -c conda-forge
-
 RUN pip install --no-cache-dir -r /tmp/requirements.txt
 
 USER root
+
+# Install QGIS. It needs root
+RUN mamba install -y "qgis=3.36.1" -c conda-forge
 
 # clean up
 RUN rm /tmp/requirements.txt && \
