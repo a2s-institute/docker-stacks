@@ -1,4 +1,4 @@
-name: Download a parent image, build a new one, and test it; then upload the image, tags, and manifests to GitHub artifacts
+name: Build and push images
 
 env:
   OWNER: ${{ github.repository_owner }}
@@ -98,12 +98,16 @@ jobs:
           username: ${{ secrets.QUAY_USERNAME }}
           password: ${{ secrets.QUAY_ROBOT_TOKEN }}
 
-      - name: Load parent image to Docker 📥
-        if: inputs.load-parent == true
-        uses: ./.github/actions/load-image
+      - name: Check changes in the image directory
+        uses: dorny/paths-filter@v3
+        id: changes
         with:
-          image: ${{ inputs.parent-image }}
-          variant: ${{ inputs.parent-variant }}
+          filters: |
+            image_changed:
+              ${{ inputs.image }}/${{ inputs.variant }}/**/!(README.md)
+            workflow_changed:
+              .github/workflows/*.yml
+          base: ${{ github.ref }}
 
       - name: Generate base image Dockerfile
         if: contains(inputs.image, 'base-gpu-notebook')
@@ -112,6 +116,9 @@ jobs:
           cd base-gpu-notebook && bash generate_dockerfile.sh && cd ..
 
       - name: Build image 🛠
+        if: |
+          ${{ steps.changes.outputs.image_changed == 'true' ||
+              steps.changes.outputs.workflow_changed == 'true' }}
         id: build_image
         uses: docker/build-push-action@v5
         with:
@@ -119,15 +126,3 @@ jobs:
           push: ${{ inputs.push }}
           tags: ${{ inputs.registry }}/${{ env.OWNER }}/${{ inputs.image }}:${{ inputs.variant }}
 
-      - name: Save image as a tar for later use 💾
-        run: |
-          mkdir -p /tmp/a2s/images/
-          docker save ${{ inputs.registry }}/${{ env.OWNER }}/${{ inputs.image }}:${{ inputs.variant }} | zstd > /tmp/a2s/images/${{ inputs.image }}--${{ inputs.variant }}.tar.zst
-        shell: bash
-
-      - name: Upload image as artifact 💾
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ inputs.image }}--${{ inputs.variant }}
-          path: /tmp/a2s/images/${{ inputs.image }}--${{ inputs.variant }}.tar.zst
-          retention-days: 3
