@@ -119,9 +119,9 @@ jobs:
 
       - name: Build image 🛠
         if: |
-          ${{ steps.changes.outputs.image_changed == 'true' ||
-              steps.changes.outputs.base_changed == 'true' ||
-              steps.changes.outputs.workflow_changed == 'true' }}
+          ${{ steps.changes.outputs.image_changed == 'true' }}
+          ${{ steps.changes.outputs.base_changed == 'true' }}
+          ${{ steps.changes.outputs.workflow_changed == 'true' }}
         id: build_image
         uses: docker/build-push-action@v5
         with:
