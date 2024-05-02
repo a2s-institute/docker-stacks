@@ -14,6 +14,9 @@ USER root
 
 # Install QGIS. It needs root
 RUN mamba install -y "qgis=3.36.1" -c conda-forge
+COPY --chown=$NB_UID:$NB_GID qgis/qgis.desktop /usr/share/applications/
+COPY --chown=$NB_UID:$NB_GID qgis/qgis.desktop /usr/local/xfce-userdirs/Desktop/
+RUN chmod +x /usr/share/applications/qgis.desktop
 
 # clean up
 RUN rm /tmp/requirements.txt && \
