@@ -105,6 +105,8 @@ jobs:
           filters: |
             image_changed:
               ${{ inputs.image }}/${{ inputs.variant }}/**/!(README.md)
+            base_changed:
+              base-gpu-notebook/**/!(README.md)
             workflow_changed:
               .github/workflows/*.yml
           base: ${{ github.ref }}
@@ -118,6 +120,7 @@ jobs:
       - name: Build image 🛠
         if: |
           ${{ steps.changes.outputs.image_changed == 'true' ||
+              steps.changes.outputs.base_changed == 'true' ||
               steps.changes.outputs.workflow_changed == 'true' }}
         id: build_image
         uses: docker/build-push-action@v5
