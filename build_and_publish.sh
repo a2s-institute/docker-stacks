@@ -137,7 +137,7 @@ function main {
   then
     echo "Building $IMAGE $TAG"
     build_image $TAG
-  elif [ "$IMAGE" = "qgis" ]
+  elif [ "$IMAGE" = "geo-notebook" ]
   then
     echo "Building $IMAGE $TAG"
     build_image $TAG
