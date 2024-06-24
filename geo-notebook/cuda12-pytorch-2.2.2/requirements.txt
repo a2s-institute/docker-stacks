@@ -4,3 +4,4 @@ geopandas
 ExifRead
 shapely
 rasterio
+torchgeo[all]

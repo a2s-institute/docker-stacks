@@ -13,10 +13,7 @@ on:
       - "base-gpu-notebook/**"
       - "ml-notebook/**"
       - "nlp-notebook/**"
-      - "raster-vision-notebook/**"
-      # We use local composite actions to combine multiple workflow steps within one action
-      # https://docs.github.com/en/actions/creating-actions/about-custom-actions#composite-actions
-      - ".github/actions/load-image/action.yml"
+      - "geo-notebook/**"
   push:
     branches:
       - main
@@ -28,8 +25,7 @@ on:
       - "base-gpu-notebook/**"
       - "ml-notebook/**"
       - "nlp-notebook/**"
-      - "raster-vision-notebook/**"
-      - ".github/actions/load-image/action.yml"
+      - "geo-notebook/**"
   workflow_dispatch:
 
 # https://docs.github.com/en/actions/using-jobs/using-concurrency
@@ -119,16 +115,16 @@ jobs:
       push: ${{ github.event_name == 'push' }}
       runs-on: ubuntu-latest
 
-  raster-vision-notebook-cuda12:
+  geo-notebook-cuda12:
     needs: [ml-notebook-cuda12]
     secrets: inherit
     uses: ./.github/workflows/docker-build-test-upload.yml
     with:
       parent-image: ml-notebook
       parent-variant: cuda12-pytorch-2.2.2
-      image: raster-vision-notebook
+      image: geo-notebook
       variant: cuda12-pytorch-2.2.2
-      context: raster-vision-notebook/cuda12-pytorch-2.2.2/
+      context: geo-notebook/cuda12-pytorch-2.2.2/
       push: ${{ github.event_name == 'push' }}
       runs-on: ubuntu-latest
 
