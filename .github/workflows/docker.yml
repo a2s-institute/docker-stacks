@@ -38,7 +38,7 @@ concurrency:
 
 jobs:
   # hub image
-  k8s-hub-2.0.0:
+  k8s-hub-2-0-0:
     secrets: inherit
     uses: ./.github/workflows/docker-build-test-upload.yml
     with:
@@ -50,7 +50,7 @@ jobs:
       context: k8s-hub/2.0.0
       push: ${{ github.event_name == 'push' }}
       runs-on: ubuntu-latest
-  k8s-hub-3.0.0:
+  k8s-hub-3-0-0:
     secrets: inherit
     uses: ./.github/workflows/docker-build-test-upload.yml
     with:
@@ -62,7 +62,7 @@ jobs:
       context: k8s-hub/3.0.0
       push: ${{ github.event_name == 'push' }}
       runs-on: ubuntu-latest
-  k8s-hub-3.2.1:
+  k8s-hub-3-2-1:
     secrets: inherit
     uses: ./.github/workflows/docker-build-test-upload.yml
     with:
