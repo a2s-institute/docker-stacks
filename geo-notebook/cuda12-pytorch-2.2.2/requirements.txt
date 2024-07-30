@@ -8,3 +8,5 @@ ExifRead
 shapely
 rasterio
 torchgeo[all]
+planetary_computer
+pystac
