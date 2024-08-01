@@ -4,12 +4,6 @@ FROM $BASE_IMAGE
 
 LABEL maintainer="Mohammad Wasil <mohammad.wasil@h-brs.de>"
 
-USER $NB_USER
-
-COPY requirements.txt /tmp/requirements.txt
-
-RUN pip install --no-cache-dir -r /tmp/requirements.txt
-
 USER root
 
 # Install QGIS. It needs root
@@ -18,7 +12,14 @@ COPY --chown=$NB_UID:$NB_GID qgis/qgis.desktop /usr/share/applications/
 COPY --chown=$NB_UID:$NB_GID qgis/qgis.desktop /usr/local/xfce-userdirs/Desktop/
 RUN chmod +x /usr/share/applications/qgis.desktop
 
+USER $NB_USER
+
+COPY requirements.txt /tmp/requirements.txt
+
+RUN pip install --no-cache-dir -r /tmp/requirements.txt
+
 # clean up
+USER root
 RUN rm /tmp/requirements.txt && \
     /opt/conda/bin/conda clean -afy && \
     find /opt/conda/ -follow -type f -name '*.a' -delete && \
