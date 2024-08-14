@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # File you want to prepend lines to
-TARGET_FILE="../../home/vscode/.local/lib/python3.12/site-packages/chromadb/__init__.py"
+TARGET_FILE="./opt/conda/lib/python3.11/site-packages/chromadb/__init__.py"
 
 # Temporary file to store the existing content
 TEMP_FILE=$(mktemp)
