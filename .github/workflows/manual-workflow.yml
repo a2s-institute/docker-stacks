@@ -10,6 +10,10 @@ on:
         description: 'Tag to build e.g. cuda11.8.0-ubuntu22.04'
         required: true
         default: 'cuda11.8.0-ubuntu22.04'
+      registry:
+        description: 'Registry to publish e.g. quay.io or ghcr.io'
+        required: true
+        default: 'quay.io'
 
 jobs:
   setup:
@@ -49,7 +53,7 @@ jobs:
     - name: Login to GitHub Container Registry
       uses: docker/login-action@v1
       with:
-        registry: ghcr.io
+        registry: $${{ needs.setup.inputs.registry }}
         username: ${{ secrets.GH_USERNAME }}
         password: ${{ secrets.GH_TOKEN }}
 
@@ -57,9 +61,10 @@ jobs:
       id: build_and_deploy_image
       run: |
         OWNER=${{ needs.setup.outputs.owner }}
+        REGISTRY=${{ needs.setup.inputs.registry }}
         IMAGE=${{ github.event.inputs.image }}
         TAG=${{ github.event.inputs.tag }}
-        bash build_and_publish.sh --registry ghcr.io --publish "all" --cuda-version $TAG --image $IMAGE
+        bash build_and_publish.sh --registry $REGISTRY --publish "all" --tag $TAG --image $IMAGE
 
     - name: Docker image list
       run: docker images
