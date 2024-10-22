@@ -23,11 +23,11 @@ on:
         type: boolean
         required: false
         default: true
-      parent_image:
+      parent-image:
         description: 'Based image to build on'
         required: false
         default: ''
-      parent_image_tag:
+      parent-image-tag:
         description: 'Based image tag to build on'
         required: false
         default: ''
@@ -37,8 +37,8 @@ jobs:
     secrets: inherit
     uses: ./.github/workflows/docker-build-test-upload.yml
     with:
-      parent-image: ${{ inputs.parent_image }}
-      parent-variant: ${{ inputs.parent_image_tag }}
+      parent-image: ${{ inputs.parent-image }}
+      parent-variant: ${{ inputs.parent-image-tag }}
       image: ${{ inputs.image }}
       variant: ${{ inputs.tag }}
       context: ${{ inputs.image }}/${{ inputs.tag }}/
