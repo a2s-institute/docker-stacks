@@ -24,6 +24,7 @@ RUN apt update -y -qq \
         xubuntu-icon-theme \
         fonts-dejavu \
         libgtk2.0-0 \
+        firefox \
     # Disable the automatic screenlock since the account password is unknown
     && apt -y -qq remove xfce4-screensaver \
     # Disable warning: Failed to execute default Terminal Emulator
