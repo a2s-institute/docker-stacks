@@ -55,6 +55,17 @@ jobs:
     runs-on: ${{ inputs.runs-on }}
 
     steps:
+      - name: Print input variables
+        run: |
+          echo "=====Input variables======"
+          echo "Parent Image: ${{ inputs.parent-image }}"
+          echo "Parent Variant: ${{ inputs.parent-variant }}"
+          echo "Image: ${{ inputs.image }}"
+          echo "Variant: ${{ inputs.variant }}"
+          echo "Context: ${{ inputs.context }}"
+          echo "Registry: ${{ inputs.registry }}"
+          echo "Push: ${{ inputs.push }}"
+          echo "Runs-on: ${{ inputs.runs-on }}"
       # Image with CUDA needs extra disk space
       - name: Free disk space 🧹
         if: contains(inputs.variant, 'cuda')
