@@ -24,6 +24,7 @@ RUN apt update -y -qq \
         xubuntu-icon-theme \
         fonts-dejavu \
         libgtk2.0-0 \
+        gfortran \  # install gfortran for Scipy compiler
     # install firefox for web0-based visualization such as tensorboard
     && wget -O /tmp/firefox.tar.bz2 "https://download.mozilla.org/?product=firefox-latest&os=linux64&lang=en-US" \
     && tar -xjf /tmp/firefox.tar.bz2 -C /opt/ \
