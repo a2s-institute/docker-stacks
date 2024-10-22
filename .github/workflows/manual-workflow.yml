@@ -11,61 +11,39 @@ on:
         required: true
         default: 'cuda11.8.0-ubuntu22.04'
       registry:
-        description: 'Registry to publish e.g. quay.io or ghcr.io'
-        required: true
-        default: 'quay.io'
+        description: Container registry to use
+        type: choice
+        required: false
+        default: quay.io
+        options:
+         - ghcr.io
+         - quay.io
+      push:
+        description: Push the image to the registry
+        type: boolean
+        required: false
+        default: true
+      parent_image:
+        description: 'Based image to build on'
+        required: false
+        default: ''
+      parent_image_tag:
+        description: 'Based image tag to build on'
+        required: false
+        default: ''
 
 jobs:
-  setup:
-    name: Setup 
-    runs-on: ubuntu-latest
+  manual_trigger:
+    secrets: inherit
+    uses: ./.github/workflows/docker-build-test-upload.yml
+    with:
+      parent-image: ${{ inputs.parent_image }}
+      parent-variant: ${{ inputs.parent_image_tag }}
+      image: ${{ inputs.image }}
+      variant: ${{ inputs.tag }}
+      context: ${{ inputs.image }}/${{ inputs.tag }}/
+      registry: ${{ inputs.registry }}
+      push: ${{ inputs.push }}
+      runs-on: ubuntu-latest
 
-    outputs:
-      owner: ${{ steps.setup_image.outputs.owner }}
-
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: Setup image
-      id: setup_image
-      run: |
-        if [ "$GITHUB_EVENT_NAME" = "pull_request" ]
-        then
-          GH_BRANCH=$GITHUB_BASE_REF
-        else
-          GH_BRANCH=${GITHUB_REF##*/}
-        fi
-
-        echo "::set-output name=owner::ghcr.io/b-it-bots/docker"
-
-  publish-gpu-notebook:
-    name: Build and publish gpu-notebook
-    needs: setup
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: Set up Docker Buildx
-      id: buildx
-      uses: docker/setup-buildx-action@v1
-
-    - name: Login to GitHub Container Registry
-      uses: docker/login-action@v1
-      with:
-        registry: $${{ needs.setup.inputs.registry }}
-        username: ${{ secrets.GH_USERNAME }}
-        password: ${{ secrets.GH_TOKEN }}
-
-    - name: Build and deploy image
-      id: build_and_deploy_image
-      run: |
-        OWNER=${{ needs.setup.outputs.owner }}
-        REGISTRY=${{ needs.setup.inputs.registry }}
-        IMAGE=${{ github.event.inputs.image }}
-        TAG=${{ github.event.inputs.tag }}
-        bash build_and_publish.sh --registry $REGISTRY --publish "all" --tag $TAG --image $IMAGE
-
-    - name: Docker image list
-      run: docker images
 
