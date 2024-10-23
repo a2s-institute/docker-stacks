@@ -30,6 +30,7 @@ RUN apt update -y -qq \
     && tar -xjf /tmp/firefox.tar.bz2 -C /opt/ \
     && ln -s /opt/firefox/firefox /usr/bin/firefox \
     && rm /tmp/firefox.tar.bz2 \ 
+    && echo "WebBrowser=firefox" >> /root/.config/xfce4/helpers.rc
     # Disable the automatic screenlock since the account password is unknown
     && apt -y -qq remove xfce4-screensaver \
     # Disable warning: Failed to execute default Terminal Emulator
@@ -50,7 +51,7 @@ RUN apt update -y -qq \
     && rm -rf /var/lib/apt/lists/* \
     && find /usr/lib/code-server -type f -name '*.js.map' -delete \
     && npm cache clean --force
-
+ 
 COPY --chown=$NB_UID:$NB_GID user-dirs.defaults /etc/xdg/
 RUN mkdir -p /usr/local/xfce-userdirs/ && \
     chown -R "$NB_UID":"$NB_GID" /usr/local/xfce-userdirs/
