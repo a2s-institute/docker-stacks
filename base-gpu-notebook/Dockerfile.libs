@@ -30,8 +30,6 @@ RUN apt update -y -qq \
     && tar -xjf /tmp/firefox.tar.bz2 -C /opt/ \
     && ln -s /opt/firefox/firefox /usr/bin/firefox \
     && rm /tmp/firefox.tar.bz2 \ 
-    && mkdir -p /root/.config/xfce4 \
-    && echo "WebBrowser=firefox" >> /root/.config/xfce4/helpers.rc \
     # Disable the automatic screenlock since the account password is unknown
     && apt -y -qq remove xfce4-screensaver \
     # Disable warning: Failed to execute default Terminal Emulator
@@ -55,7 +53,12 @@ RUN apt update -y -qq \
  
 COPY --chown=$NB_UID:$NB_GID user-dirs.defaults /etc/xdg/
 RUN mkdir -p /usr/local/xfce-userdirs/ && \
-    chown -R "$NB_UID":"$NB_GID" /usr/local/xfce-userdirs/
+    chown -R "$NB_UID":"$NB_GID" /usr/local/xfce-userdirs/ && \
+    if grep -q "^WebBrowser=" /etc/xdg/xfce4/helpers.rc; then \
+        sed -i 's/^WebBrowser=.*/WebBrowser=firefox/g' /etc/xdg/xfce4/helpers.rc; \
+    else \
+        echo "WebBrowser=firefox" >> /etc/xdg/xfce4/helpers.rc; \
+    fi
 
 RUN mamba install -y "jupyter-server-proxy>=1.4" websockify -c conda-forge && \
     mamba install -y jupyter-vscode-proxy -c conda-forge && \
