@@ -22,7 +22,8 @@ RUN pip install --no-cache-dir -r /tmp/requirements.txt
 USER root
 # (maybe) fix sqlite3 issue
 # ImportError: /opt/conda/lib/python3.11/lib-dynload/_sqlite3.cpython-311-x86_64-linux-gnu.so: undefined symbol: sqlite3_deserialize
-RUN mamba install -y sqlite
+# https://github.com/proxystore/taps/issues/151#issuecomment-2339537161
+RUN mamba install -y libsqlite==3.45.*
 
 RUN rm /tmp/requirements.txt && \
     /opt/conda/bin/conda clean -afy && \
