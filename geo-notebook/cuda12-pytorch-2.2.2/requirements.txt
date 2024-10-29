@@ -13,3 +13,4 @@ pystac
 # pyproj needs to be reinstalled
 # issue: https://github.com/pyproj4/pyproj/discussions/1262
 pyproj
+segment-geospatial
