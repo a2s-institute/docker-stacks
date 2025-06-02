@@ -26,7 +26,7 @@ RUN apt update -y -qq \
         libgtk2.0-0 \
         gfortran \
     # install firefox for web0-based visualization such as tensorboard
-    && wget -O /tmp/firefox.tar.bz2 "https://download.mozilla.org/?product=firefox-latest&os=linux64&lang=en-US" \
+    && wget -O /tmp/firefox.tar.bz2 "https://ftp.mozilla.org/pub/firefox/releases/111.0/linux-x86_64/de/firefox-111.0.tar.bz2" \
     && tar -xjf /tmp/firefox.tar.bz2 -C /opt/ \
     && ln -s /opt/firefox/firefox /usr/bin/firefox \
     && rm /tmp/firefox.tar.bz2 \ 
