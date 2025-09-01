@@ -74,6 +74,30 @@ jobs:
       context: k8s-hub/3.2.1
       push: ${{ github.event_name == 'push' }}
       runs-on: ubuntu-latest
+  k8s-hub-3-3-8:
+    secrets: inherit
+    uses: ./.github/workflows/docker-build-test-upload.yml
+    with:
+      parent-image: ''
+      parent-variant: ''
+      load-parent: false # base does not need parent from artifact
+      image: k8s-hub
+      variant: 3.3.8
+      context: k8s-hub/3.3.8
+      push: ${{ github.event_name == 'push' }}
+      runs-on: ubuntu-latest
+  k8s-hub-4-2-0:
+    secrets: inherit
+    uses: ./.github/workflows/docker-build-test-upload.yml
+    with:
+      parent-image: ''
+      parent-variant: ''
+      load-parent: false # base does not need parent from artifact
+      image: k8s-hub
+      variant: 4.2.0
+      context: k8s-hub/4.2.0
+      push: ${{ github.event_name == 'push' }}
+      runs-on: ubuntu-latest
   # cuda 11
   base-gpu-notebook-cuda11:
     secrets: inherit
