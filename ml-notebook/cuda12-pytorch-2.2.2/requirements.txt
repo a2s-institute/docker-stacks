@@ -29,4 +29,3 @@ timm
 transformers
 cmake
 lit
-jupyter-ai[all]
