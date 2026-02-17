@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=3.36.1
+Type=Application
+Name=QGIS
+Comment=QGIS
+Exec=/opt/conda/bin/qgis
+Icon=/opt/conda/share/qgis/svg/logos/qgis-logo.svg
+Path=
+Terminal=false
+StartupNotify=false

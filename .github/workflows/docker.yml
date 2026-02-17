@@ -10,11 +10,11 @@ on:
       # We use local reusable workflows to make architecture clean and simple
       # https://docs.github.com/en/actions/using-workflows/reusing-workflows
       - ".github/workflows/docker-build-test-upload.yml"
-      - "base-gpu-notebook/**"
-      - "ml-notebook/**"
-      - "nlp-notebook/**"
-      - "geo-notebook/**"
-      - "k8s-hub/**"
+      - "images/base-gpu-notebook/**"
+      - "images/ml-notebook/**"
+      - "images/nlp-notebook/**"
+      - "images/geo-notebook/**"
+      - "images/k8s-hub/**"
   push:
     branches:
       - main
@@ -23,11 +23,11 @@ on:
     paths:
       - ".github/workflows/docker.yml"
       - ".github/workflows/docker-build-test-upload.yml"
-      - "base-gpu-notebook/**"
-      - "ml-notebook/**"
-      - "nlp-notebook/**"
-      - "geo-notebook/**"
-      - "k8s-hub/**"
+      - "images/base-gpu-notebook/**"
+      - "images/ml-notebook/**"
+      - "images/nlp-notebook/**"
+      - "images/geo-notebook/**"
+      - "images/k8s-hub/**"
   workflow_dispatch:
 
 # https://docs.github.com/en/actions/using-jobs/using-concurrency
@@ -47,7 +47,7 @@ jobs:
       load-parent: false # base does not need parent from artifact
       image: k8s-hub
       variant: 2.0.0
-      context: k8s-hub/2.0.0
+      context: images/k8s-hub/2.0.0
       push: ${{ github.event_name == 'push' }}
       runs-on: ubuntu-latest
   k8s-hub-3-0-0:
@@ -59,7 +59,7 @@ jobs:
       load-parent: false # base does not need parent from artifact
       image: k8s-hub
       variant: 3.0.0
-      context: k8s-hub/3.0.0
+      context: images/k8s-hub/3.0.0
       push: ${{ github.event_name == 'push' }}
       runs-on: ubuntu-latest
   k8s-hub-3-2-1:
@@ -71,7 +71,7 @@ jobs:
       load-parent: false # base does not need parent from artifact
       image: k8s-hub
       variant: 3.2.1
-      context: k8s-hub/3.2.1
+      context: images/k8s-hub/3.2.1
       push: ${{ github.event_name == 'push' }}
       runs-on: ubuntu-latest
   k8s-hub-3-3-8:
@@ -83,7 +83,7 @@ jobs:
       load-parent: false # base does not need parent from artifact
       image: k8s-hub
       variant: 3.3.8
-      context: k8s-hub/3.3.8
+      context: images/k8s-hub/3.3.8
       push: ${{ github.event_name == 'push' }}
       runs-on: ubuntu-latest
   k8s-hub-4-2-0:
@@ -93,13 +93,28 @@ jobs:
       parent-image: ''
       parent-variant: ''
       load-parent: false # base does not need parent from artifact
-      image: k8s-hub
+      image: images/k8s-hub
       variant: 4.2.0
       context: k8s-hub/4.2.0
       push: ${{ github.event_name == 'push' }}
       runs-on: ubuntu-latest
-  # cuda 11
-  base-gpu-notebook-cuda11:
+
+  ## Foundation images e.g. cuda with specific ubuntu version
+  docker-stacks-foundation-cuda12-ubuntu22.04:
+    secrets: inherit
+    uses: ./.github/workflows/docker-build-test-upload.yml
+    with:
+      parent-image: ''
+      parent-variant: ''
+      load-parent: false # base does not need parent from artifact
+      image: docker-stacks-foundation
+      variant: cuda12-ubuntu22.04
+      context: images/docker-stacks-foundation/cuda12-ubuntu22.04
+      push: ${{ github.event_name == 'push' }}
+      runs-on: ubuntu-latest
+
+  ## base notebook - minimum requirements to run notebook 
+  base-gpu-notebook-cuda11-pytorch-2.2.2:
     secrets: inherit
     uses: ./.github/workflows/docker-build-test-upload.yml
     with:
@@ -108,12 +123,39 @@ jobs:
       load-parent: false # base does not need parent from artifact
       image: base-gpu-notebook
       variant: cuda11-pytorch-2.2.2
-      context: base-gpu-notebook/.build/cuda11-pytorch-2.2.2/
+      context: images/base-gpu-notebook/.build/cuda11-pytorch-2.2.2/
       push: ${{ github.event_name == 'push' }}
       runs-on: ubuntu-latest
-  
+
+  base-gpu-notebook-cuda12-pytorch-2.2.2:
+    secrets: inherit
+    uses: ./.github/workflows/docker-build-test-upload.yml
+    with:
+      parent-image: ''
+      parent-variant: ''
+      image: base-gpu-notebook
+      variant: cuda12-pytorch-2.2.2
+      context: images/base-gpu-notebook/.build/cuda12-pytorch-2.2.2/
+      push: ${{ github.event_name == 'push' }}
+      runs-on: ubuntu-latest
+
+  base-gpu-notebook-cuda12-ubuntu22.04:
+    needs: [docker-stacks-foundation-cuda12-ubuntu22.04]
+    secrets: inherit
+    uses: ./.github/workflows/docker-build-test-upload.yml
+    with:
+      parent-image: docker-stacks-foundation
+      parent-variant: cuda12-ubuntu22.04
+      load-parent: false # base does not need parent from artifact
+      image: base-gpu-notebook
+      variant: cuda12-pytorch-2.2.2
+      context: images/base-gpu-notebook/.build/cuda12-pytorch-2.2.2/
+      push: ${{ github.event_name == 'push' }}
+      runs-on: ubuntu-latest
+
+  ## Application notebook - ML, NLP, Geo, ROS, etc
   ml-notebook-cuda11:
-    needs: [base-gpu-notebook-cuda11]
+    needs: [base-gpu-notebook-cuda11-pytorch-2.2.2]
     secrets: inherit
     uses: ./.github/workflows/docker-build-test-upload.yml
     with:
@@ -121,7 +163,7 @@ jobs:
       parent-variant: cuda11-pytorch-2.2.2
       image: ml-notebook
       variant: cuda11-pytorch-2.2.2
-      context: ml-notebook/cuda11-pytorch-2.2.2/
+      context: images/ml-notebook/cuda11-pytorch-2.2.2/
       push: ${{ github.event_name == 'push' }}
       runs-on: ubuntu-latest
 
@@ -134,26 +176,12 @@ jobs:
       parent-variant: cuda11-pytorch-2.2.2
       image: nlp-notebook
       variant: cuda11-pytorch-2.2.2
-      context: nlp-notebook/cuda11-pytorch-2.2.2/
-      push: ${{ github.event_name == 'push' }}
-      runs-on: ubuntu-latest
-
-  # cuda12
-  base-gpu-notebook-cuda12:
-    secrets: inherit
-    uses: ./.github/workflows/docker-build-test-upload.yml
-    with:
-      parent-image: ''
-      parent-variant: ''
-      load-parent: false # base does not need parent from artifact
-      image: base-gpu-notebook
-      variant: cuda12-pytorch-2.2.2
-      context: base-gpu-notebook/.build/cuda12-pytorch-2.2.2/
+      context: images/nlp-notebook/cuda11-pytorch-2.2.2/
       push: ${{ github.event_name == 'push' }}
       runs-on: ubuntu-latest
 
   ml-notebook-cuda12:
-    needs: [base-gpu-notebook-cuda12]
+    needs: [base-gpu-notebook-cuda12-pytorch-2.2.2]
     secrets: inherit
     uses: ./.github/workflows/docker-build-test-upload.yml
     with:
@@ -161,7 +189,7 @@ jobs:
       parent-variant: cuda12-pytorch-2.2.2
       image: ml-notebook
       variant: cuda12-pytorch-2.2.2
-      context: ml-notebook/cuda12-pytorch-2.2.2/
+      context: images/ml-notebook/cuda12-pytorch-2.2.2/
       push: ${{ github.event_name == 'push' }}
       runs-on: ubuntu-latest
 
@@ -174,7 +202,7 @@ jobs:
       parent-variant: cuda12-pytorch-2.2.2
       image: nlp-notebook
       variant: cuda12-pytorch-2.2.2
-      context: nlp-notebook/cuda12-pytorch-2.2.2/
+      context: images/nlp-notebook/cuda12-pytorch-2.2.2/
       push: ${{ github.event_name == 'push' }}
       runs-on: ubuntu-latest
 
@@ -187,7 +215,7 @@ jobs:
       parent-variant: cuda12-pytorch-2.2.2
       image: geo-notebook
       variant: cuda12-pytorch-2.2.2
-      context: geo-notebook/cuda12-pytorch-2.2.2/
+      context: images/geo-notebook/cuda12-pytorch-2.2.2/
       push: ${{ github.event_name == 'push' }}
       runs-on: ubuntu-latest
 
@@ -201,7 +229,7 @@ jobs:
       load-parent: false # base does not need parent from artifact
       image: base-gpu-notebook
       variant: cuda12-ubuntu20.04
-      context: base-gpu-notebook/.build/cuda12-ubuntu20.04
+      context: images/base-gpu-notebook/.build/cuda12-ubuntu20.04
       push: ${{ github.event_name == 'push' }}
       runs-on: ubuntu-latest
 
@@ -214,6 +242,6 @@ jobs:
       parent-variant: cuda12-ubuntu20.04
       image: ros
       variant: cuda12-noetic
-      context: ros/cuda12-noetic
+      context: images/ros/cuda12-noetic
       push: ${{ github.event_name == 'push' }}
       runs-on: ubuntu-latest

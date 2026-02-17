@@ -117,7 +117,7 @@ jobs:
             image_changed:
               ${{ inputs.image }}/${{ inputs.variant }}/**/!(README.md)
             base_changed:
-              base-gpu-notebook/**/!(README.md)
+              images/base-gpu-notebook/**/!(README.md)
             workflow_changed:
               .github/workflows/*.yml
           base: ${{ github.ref }}
@@ -126,7 +126,7 @@ jobs:
         if: contains(inputs.image, 'base-gpu-notebook')
         run: | 
           # generate dockerfile
-          cd base-gpu-notebook && bash generate_dockerfile.sh && cd ..
+          cd images/base-gpu-notebook && bash generate_dockerfile.sh && cd ../..
 
       - name: Build image 🛠
         if: |

@@ -1,0 +1,7 @@
+spacy
+nltk
+gensim
+wikipedia-api
+llama-cpp-python
+# this version is a fix for gensim
+scipy==1.13.0
