@@ -93,9 +93,9 @@ jobs:
       parent-image: ''
       parent-variant: ''
       load-parent: false # base does not need parent from artifact
-      image: images/k8s-hub
+      image: k8s-hub
       variant: 4.2.0
-      context: k8s-hub/4.2.0
+      context: images/k8s-hub/4.2.0
       push: ${{ github.event_name == 'push' }}
       runs-on: ubuntu-latest
 
