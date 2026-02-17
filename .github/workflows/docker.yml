@@ -165,6 +165,7 @@ jobs:
       context: images/base-gpu-notebook/.build/cuda12-ubuntu22.04/
       push: ${{ github.event_name == 'push' }}
       runs-on: ubuntu-latest
+
   base-gpu-notebook-cuda12-ubuntu24_04:
     needs: [docker-stacks-foundation-cuda12-ubuntu24_04]
     secrets: inherit
@@ -268,5 +269,31 @@ jobs:
       image: ros
       variant: cuda12-noetic
       context: images/ros/cuda12-noetic
+      push: ${{ github.event_name == 'push' }}
+      runs-on: ubuntu-latest
+
+  cuda12-ros-humble:
+    needs: [base-gpu-notebook-cuda12-ubuntu22_04]
+    secrets: inherit
+    uses: ./.github/workflows/docker-build-test-upload.yml
+    with:
+      parent-image: base-gpu-notebook
+      parent-variant: cuda12-ubuntu22.04
+      image: ros
+      variant: cuda12-humble
+      context: images/ros/cuda12-humble
+      push: ${{ github.event_name == 'push' }}
+      runs-on: ubuntu-latest
+
+  cuda12-ros-jazzy:
+    needs: [base-gpu-notebook-cuda12-ubuntu24_04]
+    secrets: inherit
+    uses: ./.github/workflows/docker-build-test-upload.yml
+    with:
+      parent-image: base-gpu-notebook
+      parent-variant: cuda12-ubuntu24.04
+      image: ros
+      variant: cuda12-jazzy
+      context: images/ros/cuda12-jazzy
       push: ${{ github.event_name == 'push' }}
       runs-on: ubuntu-latest
