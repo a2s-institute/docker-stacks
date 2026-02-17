@@ -10,6 +10,7 @@ on:
       # We use local reusable workflows to make architecture clean and simple
       # https://docs.github.com/en/actions/using-workflows/reusing-workflows
       - ".github/workflows/docker-build-test-upload.yml"
+      - "images/docker-stacks-foundation/**"
       - "images/base-gpu-notebook/**"
       - "images/ml-notebook/**"
       - "images/nlp-notebook/**"
@@ -23,6 +24,7 @@ on:
     paths:
       - ".github/workflows/docker.yml"
       - ".github/workflows/docker-build-test-upload.yml"
+      - "images/docker-stacks-foundation/**"
       - "images/base-gpu-notebook/**"
       - "images/ml-notebook/**"
       - "images/nlp-notebook/**"
@@ -112,6 +114,18 @@ jobs:
       context: images/docker-stacks-foundation/cuda12-ubuntu22.04
       push: ${{ github.event_name == 'push' }}
       runs-on: ubuntu-latest
+  docker-stacks-foundation-cuda12-ubuntu24_04:
+    secrets: inherit
+    uses: ./.github/workflows/docker-build-test-upload.yml
+    with:
+      parent-image: ''
+      parent-variant: ''
+      load-parent: false # base does not need parent from artifact
+      image: docker-stacks-foundation
+      variant: cuda12-ubuntu24.04
+      context: images/docker-stacks-foundation/cuda12-ubuntu24.04
+      push: ${{ github.event_name == 'push' }}
+      runs-on: ubuntu-latest
 
   ## base notebook - minimum requirements to run notebook 
   base-gpu-notebook-cuda11-pytorch-2_2_2:
@@ -146,10 +160,21 @@ jobs:
     with:
       parent-image: docker-stacks-foundation
       parent-variant: cuda12-ubuntu22.04
-      load-parent: false # base does not need parent from artifact
       image: base-gpu-notebook
-      variant: cuda12-pytorch-2.2.2
-      context: images/base-gpu-notebook/.build/cuda12-pytorch-2.2.2/
+      variant: cuda12-ubuntu22.04
+      context: images/base-gpu-notebook/.build/cuda12-ubuntu22.04/
+      push: ${{ github.event_name == 'push' }}
+      runs-on: ubuntu-latest
+  base-gpu-notebook-cuda12-ubuntu24_04:
+    needs: [docker-stacks-foundation-cuda12-ubuntu24_04]
+    secrets: inherit
+    uses: ./.github/workflows/docker-build-test-upload.yml
+    with:
+      parent-image: docker-stacks-foundation
+      parent-variant: cuda12-ubuntu24.04
+      image: base-gpu-notebook
+      variant: cuda12-ubuntu24.04
+      context: images/base-gpu-notebook/.build/cuda12-ubuntu24.04/
       push: ${{ github.event_name == 'push' }}
       runs-on: ubuntu-latest
 
