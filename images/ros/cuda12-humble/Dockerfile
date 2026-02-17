@@ -44,6 +44,9 @@ RUN set -eux; \
 RUN apt update -y && \
     apt install ros-humble-desktop -y && \
     echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc && \
+    apt -y install python3-colcon-common-extensions && \
     rm -rf /var/lib/apt/lists/*
+
+
 
 USER $NB_USER
