@@ -1,0 +1,15 @@
+# freeze botocore and awscli to avoid pip backtracking loop
+botocore==1.34.131
+awscli==1.33.13
+rastervision
+seaborn
+geopandas
+ExifRead
+shapely
+rasterio
+torchgeo[all]
+planetary_computer
+pystac
+# pyproj needs to be reinstalled
+# issue: https://github.com/pyproj4/pyproj/discussions/1262
+pyproj
