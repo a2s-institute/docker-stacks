@@ -43,6 +43,7 @@ RUN set -eux; \
 
 RUN apt update -y && \
     apt install ros-jazzy-desktop -y && \
+    apt install ros-jazzy-rosbag2-storage-mcap && \
     echo "source /opt/ros/jazzy/setup.bash" >> ~/.bashrc && \
     apt -y install python3-colcon-common-extensions && \
     rm -rf /var/lib/apt/lists/*
