@@ -1,49 +1,142 @@
 name: Manual workflow
+
 on:
   workflow_dispatch:
     inputs:
+      build_all:
+        description: "Build all images (manual override)"
+        type: boolean
+        required: false
+        default: true
       image:
-        description: 'Image to build e.g. gpu-notebook'
-        required: true
-        default: 'gpu-notebook'
+        description: 'Specific image to build (leave empty or "all" to build all images)'
+        required: false
+        default: "all"
       tag:
-        description: 'Tag to build e.g. cuda11.8.0-ubuntu22.04'
-        required: true
-        default: 'cuda11.8.0-ubuntu22.04'
+        description: "Specific variant/tag (optional, e.g. 4.4.2)"
+        required: false
+        default: ""
       registry:
-        description: Container registry to use
+        description: "Container registry to use"
         type: choice
         required: false
         default: quay.io
         options:
-         - ghcr.io
-         - quay.io
+          - quay.io
+          - ghcr.io
       push:
-        description: Push the image to the registry
+        description: "Push images to registry"
         type: boolean
         required: false
         default: true
-      parent-image:
-        description: 'Based image to build on'
-        required: false
-        default: ''
-      parent-image-tag:
-        description: 'Based image tag to build on'
-        required: false
-        default: ''
+
+concurrency:
+  group: manual-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  manual_trigger:
+  discover:
+    name: Discover images to build
+    runs-on: ubuntu-latest
+    outputs:
+      matrix_level_0: ${{ steps.discover.outputs.matrix_level_0 }}
+      has_level_0: ${{ steps.discover.outputs.has_level_0 }}
+      matrix_level_1: ${{ steps.discover.outputs.matrix_level_1 }}
+      has_level_1: ${{ steps.discover.outputs.has_level_1 }}
+      matrix_level_2: ${{ steps.discover.outputs.matrix_level_2 }}
+      has_level_2: ${{ steps.discover.outputs.has_level_2 }}
+      matrix_level_3: ${{ steps.discover.outputs.matrix_level_3 }}
+      has_level_3: ${{ steps.discover.outputs.has_level_3 }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Discover images
+        id: discover
+        run: |
+          ARGS=""
+          if [ "${{ inputs.build_all }}" = "true" ] || [ "${{ inputs.image }}" = "all" ] || [ -z "${{ inputs.image }}" ]; then
+            ARGS="--build-all"
+          else
+            ARGS="--image '${{ inputs.image }}'"
+            if [ -n "${{ inputs.tag }}" ]; then
+              ARGS="$ARGS --variant '${{ inputs.tag }}'"
+            fi
+          fi
+
+          python3 .github/scripts/discover_images.py $ARGS
+
+  build-level-0:
+    name: "L0: ${{ matrix.image }}:${{ matrix.variant }}"
+    needs: discover
+    if: needs.discover.outputs.has_level_0 == 'true'
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.discover.outputs.matrix_level_0) }}
     secrets: inherit
     uses: ./.github/workflows/docker-build-test-upload.yml
     with:
-      parent-image: ${{ inputs.parent-image }}
-      parent-variant: ${{ inputs.parent-image-tag }}
-      image: ${{ inputs.image }}
-      variant: ${{ inputs.tag }}
-      context: ${{ inputs.image }}/${{ inputs.tag }}/
+      image: ${{ matrix.image }}
+      variant: ${{ matrix.variant }}
+      context: ${{ matrix.context }}
       registry: ${{ inputs.registry }}
       push: ${{ inputs.push }}
       runs-on: ubuntu-latest
 
+  build-level-1:
+    name: "L1: ${{ matrix.image }}:${{ matrix.variant }}"
+    needs: [discover, build-level-0]
+    if: always() && !cancelled() && (needs.build-level-0.result == 'success' || needs.build-level-0.result == 'skipped') && needs.discover.outputs.has_level_1 == 'true'
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.discover.outputs.matrix_level_1) }}
+    secrets: inherit
+    uses: ./.github/workflows/docker-build-test-upload.yml
+    with:
+      image: ${{ matrix.image }}
+      variant: ${{ matrix.variant }}
+      context: ${{ matrix.context }}
+      registry: ${{ inputs.registry }}
+      push: ${{ inputs.push }}
+      runs-on: ubuntu-latest
 
+  build-level-2:
+    name: "L2: ${{ matrix.image }}:${{ matrix.variant }}"
+    needs: [discover, build-level-0, build-level-1]
+    if: always() && !cancelled() && (needs.build-level-0.result == 'success' || needs.build-level-0.result == 'skipped') && (needs.build-level-1.result == 'success' || needs.build-level-1.result == 'skipped') && needs.discover.outputs.has_level_2 == 'true'
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.discover.outputs.matrix_level_2) }}
+    secrets: inherit
+    uses: ./.github/workflows/docker-build-test-upload.yml
+    with:
+      image: ${{ matrix.image }}
+      variant: ${{ matrix.variant }}
+      context: ${{ matrix.context }}
+      registry: ${{ inputs.registry }}
+      push: ${{ inputs.push }}
+      runs-on: ubuntu-latest
+
+  build-level-3:
+    name: "L3: ${{ matrix.image }}:${{ matrix.variant }}"
+    needs: [discover, build-level-0, build-level-1, build-level-2]
+    if: always() && !cancelled() && (needs.build-level-0.result == 'success' || needs.build-level-0.result == 'skipped') && (needs.build-level-1.result == 'success' || needs.build-level-1.result == 'skipped') && (needs.build-level-2.result == 'success' || needs.build-level-2.result == 'skipped') && needs.discover.outputs.has_level_3 == 'true'
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.discover.outputs.matrix_level_3) }}
+    secrets: inherit
+    uses: ./.github/workflows/docker-build-test-upload.yml
+    with:
+      image: ${{ matrix.image }}
+      variant: ${{ matrix.variant }}
+      context: ${{ matrix.context }}
+      registry: ${{ inputs.registry }}
+      push: ${{ inputs.push }}
+      runs-on: ubuntu-latest

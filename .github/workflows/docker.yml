@@ -21,25 +21,33 @@ on:
   workflow_dispatch:
     inputs:
       build_all:
-        description: "Force build all images regardless of changes"
+        description: "Build all images (manual override regardless of git changes)"
         type: boolean
         required: false
-        default: false
-      image:
-        description: "Specific image name to build (e.g. k8s-hub, ml-notebook) - optional"
-        type: string
-        required: false
-        default: ""
-      variant:
-        description: "Specific variant/tag to build (e.g. 4.4.2) - optional"
-        type: string
-        required: false
-        default: ""
+        default: true
       push:
         description: "Publish images to registry"
         type: boolean
         required: false
         default: true
+      registry:
+        description: "Container registry to publish to"
+        type: choice
+        required: false
+        default: quay.io
+        options:
+          - quay.io
+          - ghcr.io
+      image:
+        description: "Specific image name (e.g. k8s-hub) - leave empty for all"
+        type: string
+        required: false
+        default: ""
+      variant:
+        description: "Specific variant/tag (e.g. 4.4.2) - leave empty for all"
+        type: string
+        required: false
+        default: ""
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -72,13 +80,23 @@ jobs:
       - name: Discover images
         id: discover
         run: |
-          python3 .github/scripts/discover_images.py \
-            --event-name "${{ github.event_name }}" \
-            --base-ref "${{ github.event_name == 'pull_request' && format('origin/{0}', github.base_ref) || '' }}" \
-            --before-sha "${{ github.event_name == 'push' && github.event.before || '' }}" \
-            ${{ inputs.build_all && '--build-all' || '' }} \
-            --image "${{ inputs.image || '' }}" \
-            --variant "${{ inputs.variant || '' }}"
+          ARGS=""
+          if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ inputs.build_all }}" = "true" ]; then
+            ARGS="--build-all"
+          elif [ -n "${{ inputs.image }}" ]; then
+            ARGS="--image '${{ inputs.image }}'"
+            if [ -n "${{ inputs.variant }}" ]; then
+              ARGS="$ARGS --variant '${{ inputs.variant }}'"
+            fi
+          elif [ "${{ github.event_name }}" = "pull_request" ]; then
+            ARGS="--base-ref 'origin/${{ github.base_ref }}'"
+          elif [ "${{ github.event_name }}" = "push" ]; then
+            ARGS="--before-sha '${{ github.event.before }}'"
+          else
+            ARGS="--build-all"
+          fi
+
+          python3 .github/scripts/discover_images.py $ARGS
 
   build-level-0:
     name: "L0: ${{ matrix.image }}:${{ matrix.variant }}"
@@ -93,6 +111,7 @@ jobs:
       image: ${{ matrix.image }}
       variant: ${{ matrix.variant }}
       context: ${{ matrix.context }}
+      registry: ${{ inputs.registry || 'quay.io' }}
       push: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.push) }}
       runs-on: ubuntu-latest
 
@@ -109,6 +128,7 @@ jobs:
       image: ${{ matrix.image }}
       variant: ${{ matrix.variant }}
       context: ${{ matrix.context }}
+      registry: ${{ inputs.registry || 'quay.io' }}
       push: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.push) }}
       runs-on: ubuntu-latest
 
@@ -125,6 +145,7 @@ jobs:
       image: ${{ matrix.image }}
       variant: ${{ matrix.variant }}
       context: ${{ matrix.context }}
+      registry: ${{ inputs.registry || 'quay.io' }}
       push: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.push) }}
       runs-on: ubuntu-latest
 
@@ -141,5 +162,6 @@ jobs:
       image: ${{ matrix.image }}
       variant: ${{ matrix.variant }}
       context: ${{ matrix.context }}
+      registry: ${{ inputs.registry || 'quay.io' }}
       push: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.push) }}
       runs-on: ubuntu-latest
