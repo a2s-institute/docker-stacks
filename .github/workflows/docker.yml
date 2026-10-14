@@ -100,6 +100,18 @@ jobs:
       context: images/k8s-hub/4.2.0
       push: ${{ github.event_name == 'push' }}
       runs-on: ubuntu-latest
+  k8s-hub-4-4-2:
+    secrets: inherit
+    uses: ./.github/workflows/docker-build-test-upload.yml
+    with:
+      parent-image: ''
+      parent-variant: ''
+      load-parent: false # base does not need parent from artifact
+      image: k8s-hub
+      variant: 4.4.2
+      context: images/k8s-hub/4.4.2
+      push: ${{ github.event_name == 'push' }}
+      runs-on: ubuntu-latest
 
   ## Foundation images e.g. cuda with specific ubuntu version
   docker-stacks-foundation-cuda12-ubuntu22_04:
