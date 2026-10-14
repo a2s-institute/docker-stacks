@@ -45,6 +45,11 @@ on:
         type: boolean
         required: false
         default: false
+      check-changes:
+        description: Check changes before building (set false if caller already filtered)
+        type: boolean
+        required: false
+        default: false
       runs-on:
         description: GitHub Actions Runner image
         required: true
@@ -110,12 +115,13 @@ jobs:
           password: ${{ secrets.QUAY_ROBOT_TOKEN }}
 
       - name: Check changes in the image directory
+        if: ${{ inputs.check-changes }}
         uses: dorny/paths-filter@v3
         id: changes
         with:
           filters: |
             image_changed:
-              ${{ inputs.image }}/${{ inputs.variant }}/**/!(README.md)
+              images/${{ inputs.image }}/${{ inputs.variant }}/**/!(README.md)
             base_changed:
               images/base-gpu-notebook/**/!(README.md)
             workflow_changed:
@@ -130,6 +136,7 @@ jobs:
 
       - name: Build image 🛠
         if: |
+          (!inputs.check-changes) ||
           steps.changes.outputs.image_changed == 'true' ||
           steps.changes.outputs.base_changed == 'true' ||
           steps.changes.outputs.workflow_changed == 'true'

@@ -6,306 +6,140 @@ on:
     - cron: "0 3 * * 1"
   pull_request:
     paths:
-      - ".github/workflows/docker.yml"
-      # We use local reusable workflows to make architecture clean and simple
-      # https://docs.github.com/en/actions/using-workflows/reusing-workflows
-      - ".github/workflows/docker-build-test-upload.yml"
-      - "images/docker-stacks-foundation/**"
-      - "images/base-gpu-notebook/**"
-      - "images/ml-notebook/**"
-      - "images/nlp-notebook/**"
-      - "images/geo-notebook/**"
-      - "images/k8s-hub/**"
+      - "images/**"
+      - ".github/workflows/**"
+      - ".github/scripts/**"
   push:
     branches:
       - main
       - master
       - ci-test
     paths:
-      - ".github/workflows/docker.yml"
-      - ".github/workflows/docker-build-test-upload.yml"
-      - "images/docker-stacks-foundation/**"
-      - "images/base-gpu-notebook/**"
-      - "images/ml-notebook/**"
-      - "images/nlp-notebook/**"
-      - "images/geo-notebook/**"
-      - "images/k8s-hub/**"
+      - "images/**"
+      - ".github/workflows/**"
+      - ".github/scripts/**"
   workflow_dispatch:
+    inputs:
+      build_all:
+        description: "Force build all images regardless of changes"
+        type: boolean
+        required: false
+        default: false
+      image:
+        description: "Specific image name to build (e.g. k8s-hub, ml-notebook) - optional"
+        type: string
+        required: false
+        default: ""
+      variant:
+        description: "Specific variant/tag to build (e.g. 4.4.2) - optional"
+        type: string
+        required: false
+        default: ""
+      push:
+        description: "Publish images to registry"
+        type: boolean
+        required: false
+        default: true
 
-# https://docs.github.com/en/actions/using-jobs/using-concurrency
 concurrency:
-  # Only cancel in-progress jobs or runs for the current workflow - matches against branch & tags
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  # hub image
-  k8s-hub-2-0-0:
+  discover:
+    name: Discover images to build
+    runs-on: ubuntu-latest
+    outputs:
+      matrix_level_0: ${{ steps.discover.outputs.matrix_level_0 }}
+      has_level_0: ${{ steps.discover.outputs.has_level_0 }}
+      matrix_level_1: ${{ steps.discover.outputs.matrix_level_1 }}
+      has_level_1: ${{ steps.discover.outputs.has_level_1 }}
+      matrix_level_2: ${{ steps.discover.outputs.matrix_level_2 }}
+      has_level_2: ${{ steps.discover.outputs.has_level_2 }}
+      matrix_level_3: ${{ steps.discover.outputs.matrix_level_3 }}
+      has_level_3: ${{ steps.discover.outputs.has_level_3 }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Discover images
+        id: discover
+        run: |
+          python3 .github/scripts/discover_images.py \
+            --event-name "${{ github.event_name }}" \
+            --base-ref "${{ github.event_name == 'pull_request' && format('origin/{0}', github.base_ref) || '' }}" \
+            --before-sha "${{ github.event_name == 'push' && github.event.before || '' }}" \
+            ${{ inputs.build_all && '--build-all' || '' }} \
+            --image "${{ inputs.image || '' }}" \
+            --variant "${{ inputs.variant || '' }}"
+
+  build-level-0:
+    name: "L0: ${{ matrix.image }}:${{ matrix.variant }}"
+    needs: discover
+    if: needs.discover.outputs.has_level_0 == 'true'
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.discover.outputs.matrix_level_0) }}
     secrets: inherit
     uses: ./.github/workflows/docker-build-test-upload.yml
     with:
-      parent-image: ''
-      parent-variant: ''
-      load-parent: false # base does not need parent from artifact
-      image: k8s-hub
-      variant: 2.0.0
-      context: images/k8s-hub/2.0.0
-      push: ${{ github.event_name == 'push' }}
-      runs-on: ubuntu-latest
-  k8s-hub-3-0-0:
-    secrets: inherit
-    uses: ./.github/workflows/docker-build-test-upload.yml
-    with:
-      parent-image: ''
-      parent-variant: ''
-      load-parent: false # base does not need parent from artifact
-      image: k8s-hub
-      variant: 3.0.0
-      context: images/k8s-hub/3.0.0
-      push: ${{ github.event_name == 'push' }}
-      runs-on: ubuntu-latest
-  k8s-hub-3-2-1:
-    secrets: inherit
-    uses: ./.github/workflows/docker-build-test-upload.yml
-    with:
-      parent-image: ''
-      parent-variant: ''
-      load-parent: false # base does not need parent from artifact
-      image: k8s-hub
-      variant: 3.2.1
-      context: images/k8s-hub/3.2.1
-      push: ${{ github.event_name == 'push' }}
-      runs-on: ubuntu-latest
-  k8s-hub-3-3-8:
-    secrets: inherit
-    uses: ./.github/workflows/docker-build-test-upload.yml
-    with:
-      parent-image: ''
-      parent-variant: ''
-      load-parent: false # base does not need parent from artifact
-      image: k8s-hub
-      variant: 3.3.8
-      context: images/k8s-hub/3.3.8
-      push: ${{ github.event_name == 'push' }}
-      runs-on: ubuntu-latest
-  k8s-hub-4-2-0:
-    secrets: inherit
-    uses: ./.github/workflows/docker-build-test-upload.yml
-    with:
-      parent-image: ''
-      parent-variant: ''
-      load-parent: false # base does not need parent from artifact
-      image: k8s-hub
-      variant: 4.2.0
-      context: images/k8s-hub/4.2.0
-      push: ${{ github.event_name == 'push' }}
-      runs-on: ubuntu-latest
-  k8s-hub-4-4-2:
-    secrets: inherit
-    uses: ./.github/workflows/docker-build-test-upload.yml
-    with:
-      parent-image: ''
-      parent-variant: ''
-      load-parent: false # base does not need parent from artifact
-      image: k8s-hub
-      variant: 4.4.2
-      context: images/k8s-hub/4.4.2
-      push: ${{ github.event_name == 'push' }}
+      image: ${{ matrix.image }}
+      variant: ${{ matrix.variant }}
+      context: ${{ matrix.context }}
+      push: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.push) }}
       runs-on: ubuntu-latest
 
-  ## Foundation images e.g. cuda with specific ubuntu version
-  docker-stacks-foundation-cuda12-ubuntu22_04:
+  build-level-1:
+    name: "L1: ${{ matrix.image }}:${{ matrix.variant }}"
+    needs: [discover, build-level-0]
+    if: always() && !cancelled() && (needs.build-level-0.result == 'success' || needs.build-level-0.result == 'skipped') && needs.discover.outputs.has_level_1 == 'true'
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.discover.outputs.matrix_level_1) }}
     secrets: inherit
     uses: ./.github/workflows/docker-build-test-upload.yml
     with:
-      parent-image: ''
-      parent-variant: ''
-      load-parent: false # base does not need parent from artifact
-      image: docker-stacks-foundation
-      variant: cuda12-ubuntu22.04
-      context: images/docker-stacks-foundation/cuda12-ubuntu22.04
-      push: ${{ github.event_name == 'push' }}
-      runs-on: ubuntu-latest
-  docker-stacks-foundation-cuda12-ubuntu24_04:
-    secrets: inherit
-    uses: ./.github/workflows/docker-build-test-upload.yml
-    with:
-      parent-image: ''
-      parent-variant: ''
-      load-parent: false # base does not need parent from artifact
-      image: docker-stacks-foundation
-      variant: cuda12-ubuntu24.04
-      context: images/docker-stacks-foundation/cuda12-ubuntu24.04
-      push: ${{ github.event_name == 'push' }}
+      image: ${{ matrix.image }}
+      variant: ${{ matrix.variant }}
+      context: ${{ matrix.context }}
+      push: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.push) }}
       runs-on: ubuntu-latest
 
-  ## base notebook - minimum requirements to run notebook 
-  base-gpu-notebook-cuda11-pytorch-2_2_2:
+  build-level-2:
+    name: "L2: ${{ matrix.image }}:${{ matrix.variant }}"
+    needs: [discover, build-level-0, build-level-1]
+    if: always() && !cancelled() && (needs.build-level-0.result == 'success' || needs.build-level-0.result == 'skipped') && (needs.build-level-1.result == 'success' || needs.build-level-1.result == 'skipped') && needs.discover.outputs.has_level_2 == 'true'
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.discover.outputs.matrix_level_2) }}
     secrets: inherit
     uses: ./.github/workflows/docker-build-test-upload.yml
     with:
-      parent-image: ''
-      parent-variant: ''
-      load-parent: false # base does not need parent from artifact
-      image: base-gpu-notebook
-      variant: cuda11-pytorch-2.2.2
-      context: images/base-gpu-notebook/.build/cuda11-pytorch-2.2.2/
-      push: ${{ github.event_name == 'push' }}
+      image: ${{ matrix.image }}
+      variant: ${{ matrix.variant }}
+      context: ${{ matrix.context }}
+      push: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.push) }}
       runs-on: ubuntu-latest
 
-  base-gpu-notebook-cuda12-pytorch-2_2_2:
+  build-level-3:
+    name: "L3: ${{ matrix.image }}:${{ matrix.variant }}"
+    needs: [discover, build-level-0, build-level-1, build-level-2]
+    if: always() && !cancelled() && (needs.build-level-0.result == 'success' || needs.build-level-0.result == 'skipped') && (needs.build-level-1.result == 'success' || needs.build-level-1.result == 'skipped') && (needs.build-level-2.result == 'success' || needs.build-level-2.result == 'skipped') && needs.discover.outputs.has_level_3 == 'true'
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.discover.outputs.matrix_level_3) }}
     secrets: inherit
     uses: ./.github/workflows/docker-build-test-upload.yml
     with:
-      parent-image: ''
-      parent-variant: ''
-      image: base-gpu-notebook
-      variant: cuda12-pytorch-2.2.2
-      context: images/base-gpu-notebook/.build/cuda12-pytorch-2.2.2/
-      push: ${{ github.event_name == 'push' }}
-      runs-on: ubuntu-latest
-
-  base-gpu-notebook-cuda12-ubuntu22_04:
-    needs: [docker-stacks-foundation-cuda12-ubuntu22_04]
-    secrets: inherit
-    uses: ./.github/workflows/docker-build-test-upload.yml
-    with:
-      parent-image: docker-stacks-foundation
-      parent-variant: cuda12-ubuntu22.04
-      image: base-gpu-notebook
-      variant: cuda12-ubuntu22.04
-      context: images/base-gpu-notebook/.build/cuda12-ubuntu22.04/
-      push: ${{ github.event_name == 'push' }}
-      runs-on: ubuntu-latest
-
-  base-gpu-notebook-cuda12-ubuntu24_04:
-    needs: [docker-stacks-foundation-cuda12-ubuntu24_04]
-    secrets: inherit
-    uses: ./.github/workflows/docker-build-test-upload.yml
-    with:
-      parent-image: docker-stacks-foundation
-      parent-variant: cuda12-ubuntu24.04
-      image: base-gpu-notebook
-      variant: cuda12-ubuntu24.04
-      context: images/base-gpu-notebook/.build/cuda12-ubuntu24.04/
-      push: ${{ github.event_name == 'push' }}
-      runs-on: ubuntu-latest
-
-  ## Application notebook - ML, NLP, Geo, ROS, etc
-  ml-notebook-cuda11:
-    needs: [base-gpu-notebook-cuda11-pytorch-2_2_2]
-    secrets: inherit
-    uses: ./.github/workflows/docker-build-test-upload.yml
-    with:
-      parent-image: base-gpu-notebook
-      parent-variant: cuda11-pytorch-2.2.2
-      image: ml-notebook
-      variant: cuda11-pytorch-2.2.2
-      context: images/ml-notebook/cuda11-pytorch-2.2.2/
-      push: ${{ github.event_name == 'push' }}
-      runs-on: ubuntu-latest
-
-  nlp-notebook-cuda11:
-    needs: [ml-notebook-cuda11]
-    secrets: inherit
-    uses: ./.github/workflows/docker-build-test-upload.yml
-    with:
-      parent-image: ml-notebook
-      parent-variant: cuda11-pytorch-2.2.2
-      image: nlp-notebook
-      variant: cuda11-pytorch-2.2.2
-      context: images/nlp-notebook/cuda11-pytorch-2.2.2/
-      push: ${{ github.event_name == 'push' }}
-      runs-on: ubuntu-latest
-
-  ml-notebook-cuda12:
-    needs: [base-gpu-notebook-cuda12-pytorch-2_2_2]
-    secrets: inherit
-    uses: ./.github/workflows/docker-build-test-upload.yml
-    with:
-      parent-image: base-gpu-notebook
-      parent-variant: cuda12-pytorch-2.2.2
-      image: ml-notebook
-      variant: cuda12-pytorch-2.2.2
-      context: images/ml-notebook/cuda12-pytorch-2.2.2/
-      push: ${{ github.event_name == 'push' }}
-      runs-on: ubuntu-latest
-
-  nlp-notebook-cuda12:
-    needs: [ml-notebook-cuda12]
-    secrets: inherit
-    uses: ./.github/workflows/docker-build-test-upload.yml
-    with:
-      parent-image: ml-notebook
-      parent-variant: cuda12-pytorch-2.2.2
-      image: nlp-notebook
-      variant: cuda12-pytorch-2.2.2
-      context: images/nlp-notebook/cuda12-pytorch-2.2.2/
-      push: ${{ github.event_name == 'push' }}
-      runs-on: ubuntu-latest
-
-  geo-notebook-cuda12:
-    needs: [ml-notebook-cuda12]
-    secrets: inherit
-    uses: ./.github/workflows/docker-build-test-upload.yml
-    with:
-      parent-image: ml-notebook
-      parent-variant: cuda12-pytorch-2.2.2
-      image: geo-notebook
-      variant: cuda12-pytorch-2.2.2
-      context: images/geo-notebook/cuda12-pytorch-2.2.2/
-      push: ${{ github.event_name == 'push' }}
-      runs-on: ubuntu-latest
-
-  # cuda12-ubuntu20.04 for ros noetic
-  cuda12-ubuntu20_04:
-    secrets: inherit
-    uses: ./.github/workflows/docker-build-test-upload.yml
-    with:
-      parent-image: ''
-      parent-variant: ''
-      load-parent: false # base does not need parent from artifact
-      image: base-gpu-notebook
-      variant: cuda12-ubuntu20.04
-      context: images/base-gpu-notebook/.build/cuda12-ubuntu20.04
-      push: ${{ github.event_name == 'push' }}
-      runs-on: ubuntu-latest
-
-  cuda12-ros-noetic:
-    needs: [cuda12-ubuntu20_04]
-    secrets: inherit
-    uses: ./.github/workflows/docker-build-test-upload.yml
-    with:
-      parent-image: base-gpu-notebook
-      parent-variant: cuda12-ubuntu20.04
-      image: ros
-      variant: cuda12-noetic
-      context: images/ros/cuda12-noetic
-      push: ${{ github.event_name == 'push' }}
-      runs-on: ubuntu-latest
-
-  cuda12-ros-humble:
-    needs: [base-gpu-notebook-cuda12-ubuntu22_04]
-    secrets: inherit
-    uses: ./.github/workflows/docker-build-test-upload.yml
-    with:
-      parent-image: base-gpu-notebook
-      parent-variant: cuda12-ubuntu22.04
-      image: ros
-      variant: cuda12-humble
-      context: images/ros/cuda12-humble
-      push: ${{ github.event_name == 'push' }}
-      runs-on: ubuntu-latest
-
-  cuda12-ros-jazzy:
-    needs: [base-gpu-notebook-cuda12-ubuntu24_04]
-    secrets: inherit
-    uses: ./.github/workflows/docker-build-test-upload.yml
-    with:
-      parent-image: base-gpu-notebook
-      parent-variant: cuda12-ubuntu24.04
-      image: ros
-      variant: cuda12-jazzy
-      context: images/ros/cuda12-jazzy
-      push: ${{ github.event_name == 'push' }}
+      image: ${{ matrix.image }}
+      variant: ${{ matrix.variant }}
+      context: ${{ matrix.context }}
+      push: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.push) }}
       runs-on: ubuntu-latest
